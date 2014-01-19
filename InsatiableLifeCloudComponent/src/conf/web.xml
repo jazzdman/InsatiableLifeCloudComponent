@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+    <context-param>
+        <param-name>preptimeminutes</param-name>
+        <param-value>60</param-value>
+   </context-param> 
+   <context-param>
+        <param-name>preptimehours</param-name>
+        <param-value>0</param-value>
+   </context-param> 
+   <context-param>
+        <param-name>servings</param-name>
+        <param-value>1</param-value>
+   </context-param> 
+   <context-param>
+        <param-name>calories</param-name>
+        <param-value>100</param-value>
+    </context-param>    
+    <servlet>
+        <servlet-name>FPMenuServlet</servlet-name>
+        <servlet-class>servlets.FPMenuServlet</servlet-class>
+        <load-on-startup>10</load-on-startup>
+    </servlet>
+ 
+    <servlet-mapping>
+        <servlet-name>FPMenuServlet</servlet-name>
+        <url-pattern>/menu</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>FPSettingsServlet</servlet-name>
+        <servlet-class>servlets.FPSettingsServlet</servlet-class>
+        <load-on-startup>10</load-on-startup>
+    </servlet>
+ 
+    <servlet-mapping>
+        <servlet-name>FPSettingsServlet</servlet-name>
+        <url-pattern>/settings</url-pattern>
+    </servlet-mapping>
+
+    <error-page>
+    	<exception-type>java.lang.Throwable</exception-type>
+	<location>/error_recipe.xml</location>
+    </error-page>
+
+    <error-page>
+	<error-code>500</error-code>
+	<location>/error_recipe.xml</location>
+    </error-page> 
+ 
+</web-app>
