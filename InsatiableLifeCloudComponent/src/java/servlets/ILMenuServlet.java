@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,7 +31,8 @@ import org.apache.commons.codec.binary.Base64;
  * This class is responsible for responding to a web server request.
  * 
  ********************************************************************/
-public class FPMenuServlet extends HttpServlet
+@WebServlet(value="/menu")
+public class ILMenuServlet extends HttpServlet
 {
     // Defines a set of methods that a servlet uses to communicate with 
     // its servlet container, for example, to get the MIME type of a file, 
@@ -136,7 +138,7 @@ public class FPMenuServlet extends HttpServlet
     // Return a name for this servlet
     public String getServletInfo()
     {
-	return "FullPlate Menu Servlet";
+	return "Insatiable Life Menu Servlet";
     }
 
     @Override
