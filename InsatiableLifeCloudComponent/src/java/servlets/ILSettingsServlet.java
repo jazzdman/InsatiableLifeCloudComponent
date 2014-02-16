@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
  * This class is responsible for responding to a web server request.
  * 
  ********************************************************************/
-public class FPSettingsServlet extends HttpServlet
+@WebServlet(value="/settings")
+public class ILSettingsServlet extends HttpServlet
 {
     // Defines a set of methods that a servlet uses to communicate with 
     // its servlet container, for example, to get the MIME type of a file, 
@@ -43,23 +45,33 @@ public class FPSettingsServlet extends HttpServlet
     public void init(ServletConfig servletConfig) throws ServletException
     {
         int preptemp;
+        String tempString1, tempString2;
+        Enumeration<String> e = servletConfig.getInitParameterNames();
         
 	this.servletConfig = servletConfig;
         servletContext = servletConfig.getServletContext();
         
         try 
         {
-            
+            while(e.hasMoreElements())
+            {
+               servletContext.log(e.nextElement());       
+            }
+            /*
             servings = servletContext.getInitParameter("servings");
             
-            preptemp = Integer.parseInt(servletContext.getInitParameter("preptimeminutes"))+
-                       MINUTES_PER_HOUR*Integer.parseInt(servletContext.getInitParameter("preptimehours"));
+            tempString1= servletContext.getInitParameter("preptimeminutes");
+            tempString2 = servletContext.getInitParameter("preptimehours");
+            
+            preptemp = Integer.parseInt(tempString1)+
+                       MINUTES_PER_HOUR*Integer.parseInt(tempString2);
         
             prepTime = new Integer(preptemp).toString();
         
             calories = servletContext.getInitParameter("calories");
+            */
             
-        } catch (Exception e)
+        } catch (Exception ex)
         {
             servletProblem = true;
         }
@@ -78,7 +90,7 @@ public class FPSettingsServlet extends HttpServlet
     // Return a name for this servlet
     public String getServletInfo()
     {
-	return "FullPlate Settings Servlet";
+	return "Insatiable Life Settings Servlet";
     }
 
     @Override
@@ -104,9 +116,9 @@ public class FPSettingsServlet extends HttpServlet
         
         if(servletProblem)
         {
-            writer.print("</params");
+            writer.print("</params>");
             writer.print("<param>"+ new Integer(SERVER_INIT_ERROR).toString() +"</param>\r\n");
-            writer.print("</params");
+            writer.print("</params>");
             return;
         }
         
