@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import javax.servlet.ServletConfig;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -34,15 +34,11 @@ import org.apache.commons.codec.binary.Base64;
 @WebServlet(value="/menu")
 public class ILMenuServlet extends HttpServlet
 {
-    // Defines a set of methods that a servlet uses to communicate with 
-    // its servlet container, for example, to get the MIME type of a file, 
-    /// dispatch requests, or write to a log file.
-    private ServletContext servletContext;
+    
+    ServletContext servletContext;
+    
     // A variable to decide if there is a problem setting up the servlet
     private boolean servletProblem;
-      
-    // This allows the servlet to get information about Tomcat
-    private transient ServletConfig servletConfig;
     
     // Indicate an error in the init method
     private static final int SERVER_INIT_ERROR = -1;
@@ -65,8 +61,9 @@ public class ILMenuServlet extends HttpServlet
     private int maxPrepTime, minCalories, minServings;
 
     @Override
-    public void init(ServletConfig servletConfig) throws ServletException
+    public void init() throws ServletException
     {
+        
 	servletProblem = false;
 	// A temporary path to open files used in this servlet
 	StringBuffer filePath = new StringBuffer();
@@ -80,21 +77,20 @@ public class ILMenuServlet extends HttpServlet
 	// The object used to find URLs to feed to the AllRecipesProxy
 	BingProxy bingProxy = new BingProxy();
 
-	this.servletConfig = servletConfig;
-        servletContext = servletConfig.getServletContext();
+        servletContext = getServletContext();
 
 	// Attempt to open the files that need to be passed to the 
         // RecipeRequestConstructor
 	try 
 	{
 	    filePath.append(servletContext.getRealPath("/"));
-            filePath.append("conf/dishes.txt");
+            filePath.append("WEB-INF/conf/dishes.txt");
 	    dishes = Files.readAllLines(Paths.get(filePath.toString()),
 					StandardCharsets.US_ASCII);
             filePath.delete(0, filePath.length());
             
             filePath.append(servletContext.getRealPath("/"));
-            filePath.append("conf/ingredients.txt");
+            filePath.append("WEB-INF/conf/ingredients.txt");
 	    ingredients = Files.readAllLines(Paths.get(filePath.toString()),
 					StandardCharsets.US_ASCII);
             
@@ -124,14 +120,6 @@ public class ILMenuServlet extends HttpServlet
 	servletContext.setAttribute("bp",bingProxy);
 	servletContext.setAttribute("rrc", recipeConstructor);
 	
-    }
-
-    @Override 
-    // Return the reference to the servletConfig object for this
-    // servlet
-    public ServletConfig getServletConfig()
-    {
-	return servletConfig;
     }
 
     @Override
@@ -350,14 +338,12 @@ public class ILMenuServlet extends HttpServlet
 	//GZIP the HTML
         try (GZIPOutputStream gzip = new GZIPOutputStream(obj)) 
         {
-            gzip.write(str.getBytes("UTF-8"));
+            gzip.write(str.getBytes("US-ASCII"));
         }
 
-	// Get the gzip'ed string and return it to the caller
-	outStr = obj.toString("UTF-8");
 
-	// Convert gzip'ed string to Base64
-	outStr = new String(Base64.encodeBase64(outStr.getBytes()));
+	// Convert gzip'ed bytes to Base64 string
+	outStr = new String(Base64.encodeBase64(obj.toByteArray()));
 
 	return outStr;
     }

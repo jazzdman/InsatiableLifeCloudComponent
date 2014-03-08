@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1"/>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2">
+        <file>
+            <url>src/java/servlets/ILMenuServlet.java</url>
+            <bookmark id="2">
+                <name/>
+                <line>74</line>
+                <key/>
+            </bookmark>
+        </file>
+    </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/jazzdman/sandbox/FullPlateCloudComponent/src/java/web_utils/BingProxy.java</file>
-            <file>file:/Users/jazzdman/sandbox/FullPlateCloudComponent/src/conf/web.xml</file>
-            <file>file:/Users/jazzdman/sandbox/FullPlateCloudComponent/src/java/web_utils/AllRecipesProxy.java</file>
-            <file>file:/Users/jazzdman/sandbox/FullPlateCloudComponent/src/java/servlets/FPMenuServlet.java</file>
-            <file>file:/Users/jazzdman/sandbox/FullPlateCloudComponent/src/java/servlets/FPSettingsServlet.java</file>
+            <file>file:/Users/jazzdman/sandbox/InsatiableLifeCloudComponent/src/java/servlets/ILSettingsServlet.java</file>
+            <file>file:/Users/jazzdman/sandbox/InsatiableLifeCloudComponent/src/java/web_utils/AllRecipesProxy.java</file>
+            <file>file:/Users/jazzdman/sandbox/InsatiableLifeCloudComponent/src/java/servlets/ILMenuServlet.java</file>
         </group>
     </open-files>
 </project-private>

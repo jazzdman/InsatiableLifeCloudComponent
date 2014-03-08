@@ -2,9 +2,7 @@ package servlets;
 
 import java.io.PrintWriter;
 import java.io.IOException;
-import java.util.Enumeration;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,16 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(value="/settings")
 public class ILSettingsServlet extends HttpServlet
 {
-    // Defines a set of methods that a servlet uses to communicate with 
-    // its servlet container, for example, to get the MIME type of a file, 
-    /// dispatch requests, or write to a log file.
-    private ServletContext servletContext;
    
     // A variable to decide if there is a problem setting up the servlet
     private boolean servletProblem;
- 
-    // This allows the servlet to get information about Tomcat
-    private transient ServletConfig servletConfig;
     
     // Use these to store calories, preptime and servings, so we only have
     // do read the init parameters once.
@@ -42,22 +33,16 @@ public class ILSettingsServlet extends HttpServlet
     private static final int SERVER_INIT_ERROR = -1;
 
     @Override
-    public void init(ServletConfig servletConfig) throws ServletException
+    public void init() throws ServletException
     {
         int preptemp;
         String tempString1, tempString2;
-        Enumeration<String> e = servletConfig.getInitParameterNames();
-        
-	this.servletConfig = servletConfig;
-        servletContext = servletConfig.getServletContext();
+        ServletContext servletContext;
         
         try 
         {
-            while(e.hasMoreElements())
-            {
-               servletContext.log(e.nextElement());       
-            }
-            /*
+            servletContext = getServletContext();
+          
             servings = servletContext.getInitParameter("servings");
             
             tempString1= servletContext.getInitParameter("preptimeminutes");
@@ -69,21 +54,12 @@ public class ILSettingsServlet extends HttpServlet
             prepTime = new Integer(preptemp).toString();
         
             calories = servletContext.getInitParameter("calories");
-            */
             
         } catch (Exception ex)
         {
             servletProblem = true;
         }
 	
-    }
-
-    @Override 
-    // Return the reference to the servletConfig object for this
-    // servlet
-    public ServletConfig getServletConfig()
-    {
-	return servletConfig;
     }
 
     @Override
@@ -125,9 +101,8 @@ public class ILSettingsServlet extends HttpServlet
         
         writer.print("<params>\r\n");
         
-        writer.print("<preptime>"+ prepTime +"</minutes>\r\n");
+        writer.print("<preptime>"+ prepTime +"</preptime>\r\n");
        
-        
         writer.print("<servings>"+ servings +"</servings>\r\n");
         
         writer.print("<calories>"+ calories +"</calories>\r\n");

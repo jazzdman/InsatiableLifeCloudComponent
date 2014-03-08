@@ -126,6 +126,8 @@ public class AllRecipesProxy
 							  String referer)
     {
     
+        // The recipe URL with scaling factor added in
+        String urlString = url+"?scale="+new Integer(servings).toString()+"&ismetric=0";
 	// The dictionary to pass back to the caller
 	HashMap<String,Object> recipeHash = new HashMap<>();
 	// A pointer to the HTML returned from allrecipes.com
@@ -168,7 +170,7 @@ public class AllRecipesProxy
 	try 
 	{
 	    //System.out.println("URL : " + url);
-	    connection = (HttpURLConnection)new URL(url+"?scale="+new Integer(servings).toString()+"&ismetric=0").openConnection();
+	    connection = (HttpURLConnection)new URL(urlString).openConnection();
 	}
 	// If we encounter an exception here, we can't collect a recipe.
 	// We don't need to collect every single recipe, so we can bail at 
@@ -434,7 +436,7 @@ public class AllRecipesProxy
         // back to the caller.
         recipeHash.put("ingredients", ingredientArray);
         recipeHash.put("page", recipePage.toString());
-        recipeHash.put("url", url.toString());
+        recipeHash.put("url", urlString);
     
     
         return recipeHash;
