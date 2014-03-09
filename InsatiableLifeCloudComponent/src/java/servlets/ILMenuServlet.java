@@ -1,17 +1,14 @@
 package servlets;
 
+import web_utils.RecipeManager;
 import web_utils.AllRecipesProxy;
-import web_utils.BingProxy;
-import web_utils.RecipeRequestConstructor;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.PrintWriter;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -62,43 +59,17 @@ public class ILMenuServlet extends HttpServlet
 
     @Override
     public void init() throws ServletException
-    {
-        
+    {  
 	servletProblem = false;
-	// A temporary path to open files used in this servlet
-	StringBuffer filePath = new StringBuffer();
-	// The lists of dishes and ingredients used by 
-	// the RecipeRequestConstructor
-	List<String> dishes = null, ingredients = null;
-	
-	// The object used to get recipes from allrecipes.com
-	AllRecipesProxy arp = new AllRecipesProxy();
-
-	// The object used to find URLs to feed to the AllRecipesProxy
-	BingProxy bingProxy = new BingProxy();
-
         servletContext = getServletContext();
 
 	// Attempt to open the files that need to be passed to the 
         // RecipeRequestConstructor
 	try 
 	{
-	    filePath.append(servletContext.getRealPath("/"));
-            filePath.append("WEB-INF/conf/dishes.txt");
-	    dishes = Files.readAllLines(Paths.get(filePath.toString()),
-					StandardCharsets.US_ASCII);
-            filePath.delete(0, filePath.length());
-            
-            filePath.append(servletContext.getRealPath("/"));
-            filePath.append("WEB-INF/conf/ingredients.txt");
-	    ingredients = Files.readAllLines(Paths.get(filePath.toString()),
-					StandardCharsets.US_ASCII);
-            
             maxPrepTime = Integer.parseInt(servletContext.getInitParameter("preptimeminutes")) +
                             MINUTES_PER_HOUR * Integer.parseInt(servletContext.getInitParameter("preptimehours"));
-        
             minServings = Integer.parseInt(servletContext.getInitParameter("servings"));
-        
             minCalories = Integer.parseInt(servletContext.getInitParameter("calories"));
 	}
 	// If we hit an exception here, we really can't do anything with
@@ -108,18 +79,6 @@ public class ILMenuServlet extends HttpServlet
 	    servletProblem = true;
 	    return;
 	}
-
-
-	// Create the RecipeRequestConstructor
-	RecipeRequestConstructor recipeConstructor = 
-	    new RecipeRequestConstructor(dishes, ingredients);
-	
-	// Save these variables to the servlet context of
-	// this application
-	servletContext.setAttribute("arp", arp);
-	servletContext.setAttribute("bp",bingProxy);
-	servletContext.setAttribute("rrc", recipeConstructor);
-	
     }
 
     @Override
@@ -142,17 +101,15 @@ public class ILMenuServlet extends HttpServlet
 	     	      HttpServletResponse response) throws ServletException,
 							 IOException
     {
-	AllRecipesProxy arp;
-	BingProxy bp;
-	RecipeRequestConstructor rrc;
         String current_request_url, encodedString;
         int tmpCal, tmpTime, tmpServ;
 	response.setContentType("text/xml");
 	PrintWriter writer = response.getWriter();
 	List<String> ingredientArray;
-        HashMap<String,Object> tempHash;
+        ArrayList<HashMap<String,String>> recipeList;
+        RecipeManager recipeManager = (RecipeManager)servletContext.getAttribute("rm");
+        AllRecipesProxy arp = new AllRecipesProxy();
         
-        servletContext.log("doGet has been called.");
 	
         // Start the XML document
         writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
@@ -160,26 +117,17 @@ public class ILMenuServlet extends HttpServlet
         
         // Don't return any results if we had a problem starting the servlet.
         // Indicate servlet error with count of -1
-        if (servletProblem)
+        if (servletProblem || recipeManager == null)
         {
             writer.print("<count>"+ new Integer(SERVER_INIT_ERROR).toString()+"</count>");
             writer.print("</recipes>");
             return;
         }
 
-	// Get the objects saved in the init method
-	rrc = (RecipeRequestConstructor)servletContext.getAttribute("rrc");
-	bp = (BingProxy)servletContext.getAttribute("bp");
-	arp = (AllRecipesProxy)servletContext.getAttribute("arp");
+	
 
         try
-	{
-	    // Get the URL to send to Bing
-	    current_request_url = rrc.getRequest();
-	
-	    // Get recipe URLs from Bing
-	    bp.findRecipes(current_request_url);
-            
+	{   
              // Check to make sure the request parameters are named correctly 
             // and have acceptable values.
 	    if (!validateRequest(request))
@@ -189,38 +137,20 @@ public class ILMenuServlet extends HttpServlet
 		return;
 	    }
             
-	    // If we didn't get any recipe URLs, send back an empty
-	    // XML document.  Indicate empty list with count of -2
-	    if (bp.getRecipeURLs().isEmpty())
-	    {   
-                writer.print("<count>"+new Integer(BING_LIST_EMPTY_ERROR).toString()+"</count>");
-                writer.print("</recipes>");
-		return;
-	    } else 
-            {
-                 writer.print("<count>"+new Integer(bp.getRecipeURLs().size())+"</count>\r\n");
-            }
-
-	    // Get all recipes we can find that match the request parameters
-            for(String url:bp.getRecipeURLs())
-	    { 
-		arp.generateRecipes(url, 
-				    calories, 
-				    prepTime, 
-				    servings, 
-				    current_request_url);
-	    }
+            
 	}
 	// If we hit a problem, don't do anything. We want to return
 	// whatever we did find.
 	catch(Exception e)
 	{
-            e.printStackTrace();
             writer.print("<count>"+ new Integer(SERVER_COLLECT_ERROR).toString()+"</count>");
             writer.print("</recipes>");
             return;
 	}
 
+        recipeList = recipeManager.getRecipes(calories, prepTime);
+        
+        arp.generateRecipes(recipeList, servings);
         
 	for(HashMap<String,Object> recipe:arp.getRecipeList())
 	{
