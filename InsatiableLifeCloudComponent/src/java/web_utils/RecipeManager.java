@@ -16,14 +16,12 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 import common.BusyFlag;
 
@@ -41,17 +39,17 @@ public class RecipeManager extends Thread
     // the RecipeRequestConstructor
     private List<String> dishes = null, ingredients = null;
     
-    private ArrayList<HashMap<String,String>> recipeList;
+    private final HashMap<String, HashMap<String,String>> recipeList;
         
-    private RecipeRequestConstructor recipeRequestConstructor;
+    private final RecipeRequestConstructor recipeRequestConstructor;
         
-    private AllRecipesProxy allRecipesProxy;
+    private final AllRecipesProxy allRecipesProxy;
         
-    private BingProxy bingProxy;
+    private final BingProxy bingProxy;
     
     private boolean running;
     
-    private BusyFlag bf;
+    private final BusyFlag bf;
     
     private static final int MAX_RECIPES = 1000;
     
@@ -86,28 +84,25 @@ public class RecipeManager extends Thread
         
         bf = new BusyFlag();
         
-        recipeList = new ArrayList();
+        recipeList = new HashMap();
         
         fillRecipeList(directoryPath);
             
         this.start();
     }
     
+    @Override
     public void run()
     {
-        String tempTitle1, tempTitle2;
         String current_request_url;
         HashMap<String, String> recipeHash;
-        boolean foundDuplicate;
         
         while(running)
         {
-            
-            foundDuplicate = false;
             if(recipeList.size() == MAX_RECIPES)
             {   try
                 {
-                    Thread.sleep(10);
+                   Thread.sleep(10);
                 } catch (Exception e)
                 {
                     // If we can't sleep, it's no big deal
@@ -132,26 +127,15 @@ public class RecipeManager extends Thread
                 {
                     recipeHash = allRecipesProxy.generateRecipe(url, current_request_url);
                     
-                    
-                    for(HashMap<String,String> tempHash:recipeList)
-                    {
-                        tempTitle1 = (String)tempHash.get("title");
-                        tempTitle2 = (String)recipeHash.get("title");
-                        
-                        if(tempTitle1.matches(tempTitle2))
-                        {
-                            foundDuplicate = true;
-                            break;
-                        }
-                    }
-                    
-                    if(foundDuplicate)
+                    if(recipeHash == null)
                         continue;
                     
-                    if(recipeHash != null)
+                    if(!recipeList.containsKey(recipeHash.get("title")))
                     {
-                        recipeList.add(recipeHash);
+                        System.out.println("Holding onto recipe: "+(String)recipeHash.get("title"));
+                        recipeList.put(recipeHash.get("title"), recipeHash);
                     }
+                    
                     if(recipeList.size() == MAX_RECIPES)
                     {
                         break;
@@ -176,34 +160,45 @@ public class RecipeManager extends Thread
         bf.freeBusyFlag();
         
     }
-    
+
+    /**
+     *
+     * @param calories
+     * @param prepTime
+     * @return
+     */
     public ArrayList<HashMap<String,String>> getRecipes(int calories, int prepTime)
     {
         ArrayList<HashMap<String,String>> recipesToReturn = new ArrayList();
+        ArrayList<String> itemsToRemove = new ArrayList();
         int recipeCount=0;
-        HashMap<String, String> recipe;
+        HashMap<String,String> recipe;
         int cal, pt;
         
         bf.getBusyFlag();
         
-        while(recipeCount < RECIPE_COUNT)
+        for(String title:recipeList.keySet())
         {
-            for(int i = 0; i < recipeList.size(); i++)
+            recipe = recipeList.get(title);
+            cal = Integer.parseInt((String)recipe.get("calories"));
+            pt = Integer.parseInt((String)recipe.get("preptime"));
+                
+            if(cal <= calories &&
+               pt <= prepTime &&
+               recipe.get("error") == null)
             {
-                recipe = recipeList.get(i);
-                cal = Integer.parseInt((String)recipe.get("calories"));
-                pt = Integer.parseInt((String)recipe.get("preptime"));
-                
-                if(cal <= calories &&
-                   pt <= prepTime &&
-                   recipe.get("error") == null)
-                {
-                    recipesToReturn.add(recipe);
-                    recipeList.remove(i);
-                    recipeCount++;
-                }
-                
-            }
+                recipesToReturn.add(recipe);
+                itemsToRemove.add(title);
+                recipeCount++;
+            }   
+             
+            if(recipeCount == RECIPE_COUNT)
+                break;
+        }
+        
+        for(String item:itemsToRemove)
+        {
+            recipeList.remove(item);
         }
         
         bf.freeBusyFlag();
@@ -214,26 +209,35 @@ public class RecipeManager extends Thread
     public void fillRecipeList(String directoryPath)
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
+        DocumentBuilder db;
         Document recipeDoc;
         Element rootElement;
-        NodeList tempList;
+        NodeList rcpList, recipeChildren;
         HashMap<String,String> tempHash;
-        Node tempNode;
+        Node recipeNode, tempNode;
+        String urlValue=null;
         
         try 
         {
             db = dbf.newDocumentBuilder();
             recipeDoc = db.parse(directoryPath+"/conf/recipelist.xml");
             rootElement = recipeDoc.getDocumentElement();
-            tempList = rootElement.getElementsByTagName("recipe");
+            rcpList = rootElement.getElementsByTagName("recipe");
             
-            for(int i = 0; i < tempList.getLength(); i++)
+            for(int i = 0; i < rcpList.getLength(); i++)
             {
-                tempNode = tempList.item(i);
+                recipeNode = rcpList.item(i);
+                recipeChildren = recipeNode.getChildNodes();
                 tempHash = new HashMap();
-                tempHash.put(tempNode.getNodeName(), tempNode.getNodeValue());
-                recipeList.add(tempHash);
+                for(int j = 0; j < recipeChildren.getLength(); j++)
+                {
+                    tempNode = recipeChildren.item(j);
+                    if(tempNode.getNodeName().matches("url"))
+                        urlValue = tempNode.getNodeValue();
+                    tempHash.put(tempNode.getNodeName(), tempNode.getNodeValue());
+                }
+                
+                recipeList.put(urlValue, tempHash);
             }
         } catch (Exception e)
         {
@@ -243,7 +247,8 @@ public class RecipeManager extends Thread
     
     public void serializeRecipeList(String directoryPath)
     {
-        BufferedWriter bw=null;
+        BufferedWriter bw;
+        HashMap<String,String> recipe;
              
         try
         {
@@ -253,12 +258,13 @@ public class RecipeManager extends Thread
             
             bw.write("<recipes>\r\n");
         
-            for(HashMap<String,String> recipe:recipeList)
+            for(String keyOne:recipeList.keySet())
             {
                 bw.write("\t<recipe>\r\n");
-                for(String key:recipe.keySet())
+                recipe = recipeList.get(keyOne);
+                for(String keyTwo:recipe.keySet())
                 {
-                    bw.write("\t\t<"+ key+">"+recipe.get(key)+"</"+key+">\r\n");
+                    bw.write("\t\t<"+ keyTwo+">"+recipe.get(keyTwo)+"</"+keyTwo+">\r\n");
                 }
                     
                 bw.write("\t</recipe>\r\n");
