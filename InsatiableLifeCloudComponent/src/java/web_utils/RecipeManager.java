@@ -95,12 +95,15 @@ public class RecipeManager extends Thread
     
     public void run()
     {
+        String tempTitle1, tempTitle2;
         String current_request_url;
         HashMap<String, String> recipeHash;
+        boolean foundDuplicate;
         
         while(running)
         {
             
+            foundDuplicate = false;
             if(recipeList.size() == MAX_RECIPES)
             {   try
                 {
@@ -128,7 +131,23 @@ public class RecipeManager extends Thread
                 for(String url:bingProxy.getRecipeURLs())
                 {
                     recipeHash = allRecipesProxy.generateRecipe(url, current_request_url);
-                            
+                    
+                    
+                    for(HashMap<String,String> tempHash:recipeList)
+                    {
+                        tempTitle1 = (String)tempHash.get("title");
+                        tempTitle2 = (String)recipeHash.get("title");
+                        
+                        if(tempTitle1.matches(tempTitle2))
+                        {
+                            foundDuplicate = true;
+                            break;
+                        }
+                    }
+                    
+                    if(foundDuplicate)
+                        continue;
+                    
                     if(recipeHash != null)
                     {
                         recipeList.add(recipeHash);
@@ -163,7 +182,7 @@ public class RecipeManager extends Thread
         ArrayList<HashMap<String,String>> recipesToReturn = new ArrayList();
         int recipeCount=0;
         HashMap<String, String> recipe;
-        String cal, pt;
+        int cal, pt;
         
         bf.getBusyFlag();
         
@@ -172,11 +191,11 @@ public class RecipeManager extends Thread
             for(int i = 0; i < recipeList.size(); i++)
             {
                 recipe = recipeList.get(i);
-                cal = recipe.get("calories");
-                pt = recipe.get("preptime");
+                cal = Integer.parseInt((String)recipe.get("calories"));
+                pt = Integer.parseInt((String)recipe.get("preptime"));
                 
-                if(cal.matches(new Integer(calories).toString()) &&
-                   pt.matches(new Integer(prepTime).toString()) &&
+                if(cal <= calories &&
+                   pt <= prepTime &&
                    recipe.get("error") == null)
                 {
                     recipesToReturn.add(recipe);
