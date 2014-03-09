@@ -71,6 +71,11 @@ public class ILMenuServlet extends HttpServlet
                             MINUTES_PER_HOUR * Integer.parseInt(servletContext.getInitParameter("preptimehours"));
             minServings = Integer.parseInt(servletContext.getInitParameter("servings"));
             minCalories = Integer.parseInt(servletContext.getInitParameter("calories"));
+            
+    
+            RecipeManager rm = new RecipeManager(getServletContext().getRealPath("/"));
+            servletContext.setAttribute("rm", rm);
+            
 	}
 	// If we hit an exception here, we really can't do anything with
 	// the servlet.  Stop at this point.
@@ -101,8 +106,7 @@ public class ILMenuServlet extends HttpServlet
 	     	      HttpServletResponse response) throws ServletException,
 							 IOException
     {
-        String current_request_url, encodedString;
-        int tmpCal, tmpTime, tmpServ;
+        String encodedString;
 	response.setContentType("text/xml");
 	PrintWriter writer = response.getWriter();
 	List<String> ingredientArray;
@@ -206,10 +210,7 @@ public class ILMenuServlet extends HttpServlet
     // Where the servlet closes any persistent objects
     public void destroy()
     {
-
-	servletContext.removeAttribute("arp");
-	servletContext.removeAttribute("bp");
-	servletContext.removeAttribute("rrc");
+        servletContext.removeAttribute("rm");
     }
 
     // This method breaks apart the query string ?X=A&Y=B&Z=C 
