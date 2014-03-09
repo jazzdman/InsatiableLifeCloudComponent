@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -23,20 +24,20 @@ public class BingProxy
 {
 
     // The list of URLs that this class finds
-    private final ArrayList<String> recipeURLs;
+    private final HashMap<String, Object> recipeURLs;
 
     // The constructor for this class.
     // Initialize the list of URLs
     public BingProxy()
     {
-	recipeURLs = new ArrayList<>();
+	recipeURLs = new HashMap();
     }
 
     // Return the list of URLs, and its contents, compiled 
     // by this class
     public ArrayList<String> getRecipeURLs()
     {
-	return recipeURLs;
+	return new ArrayList(recipeURLs.keySet());
     }
 
     // This method is called to actually carry out the search for
@@ -55,8 +56,7 @@ public class BingProxy
 	URL tempURL1;
 	StringBuffer bingPage = new StringBuffer();
 	BufferedReader in;
-	List<String> searchResults = new ArrayList<>(), 
-	          searchResults2 = new ArrayList<>();
+	List<String> searchResults = new ArrayList<>();
 	int rndIndex;
 	Pattern ptrn;
 	Matcher mtchr;
@@ -149,30 +149,9 @@ public class BingProxy
 	    //System.out.println(mtchr.group(1)+"\r\n");
             tmp = mtchr.group(1);
             tmp = tmp.toLowerCase();
-            searchResults2.add(tmp);
-	}
+            if(!recipeURLs.containsKey(tmp))
+                recipeURLs.put(tmp, new Object());
+	}   
 
-	// Make sure there are no duplicates
-        for(int i = 0; i<searchResults2.size(); i++)
-        {
-            tmp1 = searchResults2.get(i);
-            for(int j = 0; j<searchResults2.size(); j++)
-            {
-                tmp2 = searchResults2.get(j);
-                
-                if((i!=j) && (tmp1.compareTo(tmp2) == 0))
-                {
-                    searchResults2.remove(tmp1);
-                }
-            }
-        }
-	
-        
-	// Store the URLs in the recipeURLs instance variable.
-	for ( String url : searchResults2) 
-	{
-	    System.out.println(url+"\r\n");
-	    recipeURLs.add(url +"Detail.aspx");             
-        }  
     }
 }
