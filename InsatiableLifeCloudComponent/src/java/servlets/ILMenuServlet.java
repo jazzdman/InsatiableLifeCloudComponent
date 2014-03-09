@@ -73,7 +73,7 @@ public class ILMenuServlet extends HttpServlet
             minCalories = Integer.parseInt(servletContext.getInitParameter("calories"));
             
     
-            RecipeManager rm = new RecipeManager(getServletContext().getRealPath("/"));
+            RecipeManager rm = new RecipeManager(servletContext.getRealPath("/"));
             servletContext.setAttribute("rm", rm);
             
 	}
@@ -210,6 +210,10 @@ public class ILMenuServlet extends HttpServlet
     // Where the servlet closes any persistent objects
     public void destroy()
     {
+        RecipeManager rm = (RecipeManager)servletContext.getAttribute("rm");
+        rm.end();
+        rm.serializeRecipeList(servletContext.getRealPath("/"));
+        
         servletContext.removeAttribute("rm");
     }
 
