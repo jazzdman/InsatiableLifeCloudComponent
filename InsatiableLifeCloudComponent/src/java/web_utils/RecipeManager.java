@@ -96,6 +96,7 @@ public class RecipeManager extends Thread
     {
         String current_request_url;
         HashMap<String, String> recipeHash;
+        int rndIndex;
         
         while(running)
         {
@@ -119,6 +120,11 @@ public class RecipeManager extends Thread
 	
                 // Get recipe URLs from Bing
                 bingProxy.findRecipes(current_request_url);
+                
+                // Get a random number based on the number of search
+                // results
+                rndIndex = (int)Math.random()*bingProxy.getSearchResults().size();
+                bingProxy.filterRecipes(rndIndex);
                 
                 if(bingProxy.getRecipeURLs().isEmpty())
                     continue;
