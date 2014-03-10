@@ -55,7 +55,7 @@ public class ILSettingsServlet extends HttpServlet
         
             calories = servletContext.getInitParameter("calories");
             
-        } catch (Exception ex)
+        } catch (NumberFormatException ex)
         {
             servletProblem = true;
         }
@@ -83,34 +83,30 @@ public class ILSettingsServlet extends HttpServlet
 							   IOException,
                                                            NumberFormatException
     {
-        
 	response.setContentType("text/xml");
-	PrintWriter writer = response.getWriter();
-	
-        // Start the XML document
-        writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-        
-        if(servletProblem)
+        try (PrintWriter writer = response.getWriter()) 
         {
+            writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+            
+            if(servletProblem)
+            {
+                writer.print("</params>");
+                writer.print("<param>"+ new Integer(SERVER_INIT_ERROR).toString() +"</param>\r\n");
+                writer.print("</params>");
+                return;
+            }
+            
+            
+            writer.print("<params>\r\n");
+            
+            writer.print("<preptime>"+ prepTime +"</preptime>\r\n");
+            
+            writer.print("<servings>"+ servings +"</servings>\r\n");
+            
+            writer.print("<calories>"+ calories +"</calories>\r\n");
+            
             writer.print("</params>");
-            writer.print("<param>"+ new Integer(SERVER_INIT_ERROR).toString() +"</param>\r\n");
-            writer.print("</params>");
-            return;
         }
-        
-        
-        writer.print("<params>\r\n");
-        
-        writer.print("<preptime>"+ prepTime +"</preptime>\r\n");
-       
-        writer.print("<servings>"+ servings +"</servings>\r\n");
-        
-        writer.print("<calories>"+ calories +"</calories>\r\n");
-        
-        writer.print("</params>");
-        
-	//close the writer
-	writer.close();
     }
 
     @Override
