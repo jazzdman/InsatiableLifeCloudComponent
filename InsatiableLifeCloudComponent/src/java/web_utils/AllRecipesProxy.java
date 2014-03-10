@@ -3,7 +3,6 @@ package web_utils;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.zip.GZIPInputStream;
@@ -52,7 +51,7 @@ public class AllRecipesProxy
     public void generateRecipes(ArrayList<HashMap<String,String>> recipeHashes,
                                 int servings)
     {
-        HashMap<String, Object> tempHash = null;
+        HashMap<String, Object> tempHash;
         String tempString;
         
         for(HashMap<String, String> recipeHash:recipeHashes)
@@ -102,7 +101,7 @@ public class AllRecipesProxy
         InputStream is = null;
         Pattern ptrn;
         Matcher mtchr;
-        String tmpMatch1=null, tmpMatch2=null;
+        String tmpMatch1, tmpMatch2;
 
         // Create a request and set header fields to make it 
         // look like we're sending this from a web browser.
@@ -115,7 +114,7 @@ public class AllRecipesProxy
         // We don't need to collect every single recipe, so we can bail at 
         // this point.  We signal an error by setting the title of the 
         // recipe to an empty string.
-        catch (Exception e)
+        catch (IOException e)
         {
             recipeHash.put("title", "");
             return recipeHash;
@@ -161,7 +160,7 @@ public class AllRecipesProxy
             // We don't need to collect every single recipe, so we can bail at 
             // this point.  We signal an error by setting the title of the 
             // recipe to an empty string.
-            catch(Exception e)
+            catch(IOException e)
             {
                 recipeHash.put("title", "");
                 return recipeHash;
@@ -172,7 +171,7 @@ public class AllRecipesProxy
         // We don't need to collect every single recipe, so we can bail at 
         // this point.  We signal an error by setting the title of the 
         // recipe to an empty string.
-        catch(Exception e)
+        catch(IOException e)
         {
             recipeHash.put("title", "");
             return recipeHash;
@@ -191,7 +190,7 @@ public class AllRecipesProxy
         // We don't need to collect every single recipe, so we can bail at 
         // this point.  We signal an error by setting the title of the 
         // recipe to an empty string.
-        catch(Exception e)
+        catch(IOException e)
         {
             recipeHash.put("title", "");
             return recipeHash;
@@ -253,11 +252,7 @@ public class AllRecipesProxy
     public HashMap<String, String> generateRecipe(String url, String current_request_url)
 				throws MalformedURLException, IOException
     {
-
-	int current_recipe;
-	boolean foundRepeat = false;
 	HashMap<String,String> returnHash;
-	String tmpString;
 
 	// Get a HashMap that represents a recipe
         returnHash = loadRecipeWithReferer(url, current_request_url);
@@ -289,9 +284,6 @@ public class AllRecipesProxy
 	StringBuffer recipePage;
 	// The Regular Expression used to find a recipe title
         String titleRegex = "<title>\\s*(.*?) - Allrecipes.com";
-	// The Regular Expression used to find ingredients in a recipe
-	String ingredientsRegex = 
-	"class=\"ingredient-amount\">(.*?)</span>.*?class=\"ingredient-name\">(.*?)</span>";
 	// An RE to help us find the number of calories per serving
 	// in a recipe
 	String calorieRegex1 = 
@@ -303,15 +295,13 @@ public class AllRecipesProxy
 	String userAgent, tmp;
 	// The connection we will make to allrecipes.com
 	HttpURLConnection connection;
-	// The array of ingredients
-	List<String> ingredientArray = new ArrayList<>(); 
 	List<String> matches;
 	BufferedReader in;
 	GZIPInputStream gis;
 	InputStream is;
 	Pattern ptrn;
 	Matcher mtchr;
-        String tmpMatch1, tmpMatch2;
+        String tmpMatch1;
         
 
 	// Create a request and set header fields to make it 
@@ -325,7 +315,7 @@ public class AllRecipesProxy
 	// We don't need to collect every single recipe, so we can bail at 
 	// this point.  We signal an error by setting the title of the 
         // recipe to an empty string.
-	catch (Exception e)
+	catch (IOException e)
 	{
 	    //e.printStackTrace();
             recipeHash.put("error",e.getMessage());
@@ -373,7 +363,7 @@ public class AllRecipesProxy
 	    // We don't need to collect every single recipe, so we can bail at 
 	    // this point.  We signal an error by setting the title of the 
 	    // recipe to an empty string.
-	    catch(Exception e)
+	    catch(IOException e)
 	    {
 		//e.printStackTrace();
                 recipeHash.put("error",e.getMessage());
@@ -386,7 +376,7 @@ public class AllRecipesProxy
 	// We don't need to collect every single recipe, so we can bail at 
 	// this point.  We signal an error by setting the title of the 
         // recipe to an empty string.
-	catch(Exception e)
+	catch(IOException e)
 	{
 	    //e.printStackTrace();
             recipeHash.put("error",e.getMessage());
@@ -407,7 +397,7 @@ public class AllRecipesProxy
 	// We don't need to collect every single recipe, so we can bail at 
 	// this point.  We signal an error by setting the title of the 
         // recipe to an empty string.
-	catch(Exception e)
+	catch(IOException e)
 	{
 	    //e.printStackTrace();
             recipeHash.put("error",e.getMessage());
