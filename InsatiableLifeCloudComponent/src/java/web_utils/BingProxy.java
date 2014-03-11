@@ -55,8 +55,7 @@ public class BingProxy
 
     // This method is called to actually carry out the search for
     // allrecipes.com URLs using Bing.  It uses Regular Expressions
-    // to grab a random page of Bing results and to then scrape out
-    // the actual allrecipes.com URLs from that random Bing page.
+    // to grab a random page of Bing results.
     public void findRecipes(String searchString) throws MalformedURLException,
 							IOException
     {
@@ -99,11 +98,16 @@ public class BingProxy
 	}
     }
     
+    // This a utility method.  By allowing access to the search results we
+    // got from Bing, we are able to unit test this class.
     public List<String> getSearchResults()
     {
         return searchResults;
     }
     
+    // This method was split off from the findRecipes method to enable
+    // unit testing of this class.  This method scrapes out the actual 
+    // allrecipes.com URLs from a random Bing page.
     public void filterRecipes(int rndIndex) throws MalformedURLException,
 							IOException
     {
