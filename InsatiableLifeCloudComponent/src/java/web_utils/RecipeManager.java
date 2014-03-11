@@ -26,35 +26,71 @@ import org.w3c.dom.NodeList;
 import common.BusyFlag;
 
 /**
- *
+ * The Insatiable Life app is evolving.  It was originally up to the 
+ * AllRecipiesProxy class to collect recipes one at a time in response
+ * to a request from a client.  
+ * 
+ * For this iteration, the RecipeManager is a subclass of Thread.  The thread
+ * uses the RecipeRequestConstructor, BingProxy and AllRecipesPoxy to keep a 
+ * random list of recipes full.  When the ILMenuServlet needs a recipe, 
+ * it uses this class to search the HashMap for recipes that match a client's
+ * request.
+ * 
+ * The next iteration of the Insatiable Life app will implement a local recipe
+ * database.
+ * 
  * @author jazzdman
  */
 public class RecipeManager extends Thread
 {
     
-    // A temporary path to open files used in this servlet 
+    // A temporary path to open files on the server
     private StringBuffer filePath;
     
     // The lists of dishes and ingredients used by 
     // the RecipeRequestConstructor
     private List<String> dishes = null, ingredients = null;
     
+    // The list of recipes that this class maintains to 
     private final HashMap<String, HashMap<String,String>> recipeList;
-        
+      
+    // An object to create a random recipe search for Bing.
     private final RecipeRequestConstructor recipeRequestConstructor;
         
+    // An object that calls to allrecipes.com with a URL created by the
+    // BingProxy and returns a recipe.
     private final AllRecipesProxy allRecipesProxy;
         
+    // An object that sends the results from the RecipeRequestConstructor
+    // to Bing and saves the allrecipes.com URLs
     private final BingProxy bingProxy;
     
+    // This starts true and the Thread keeps running until this is false.
     private boolean running;
     
+    // An object to stop and start Threads that call this object, so we don't
+    // try to simultaneously read and write to the recipeList or run into other
+    // race conditions.
     private final BusyFlag bf;
     
+    // The size of the recipeList
     private static final int MAX_RECIPES = 1000;
     
+    // The maximum number of recipes that we will try to 
+    // pull out of the recipeList when getRecipes is called.
     private static final int RECIPE_COUNT = 10;
     
+    
+    // The constructor for this class.  
+    // Read in data to pass to the RecipeRequestConstructor.
+    // Start the Thread.
+    // Instantiate :
+    //      1) a BingProxy
+    //      2) a AllRecipesProxy 
+    //      3) A RecipeRequestConstructor
+    //      4) A BusyFlag
+    //      5) The recipeList
+    //
     public RecipeManager(String directoryPath) throws IOException
     {
         filePath = new StringBuffer();
@@ -70,27 +106,24 @@ public class RecipeManager extends Thread
 	ingredients = Files.readAllLines(Paths.get(filePath.toString()),
 					StandardCharsets.US_ASCII);
             
-        // Create the RecipeRequestConstructor
+        // Instantiate member variables
         recipeRequestConstructor = 
                     new RecipeRequestConstructor(dishes, ingredients);
-            
-        // The object used to get recipes from allrecipes.com
         allRecipesProxy = new AllRecipesProxy();
-
-        // The object used to find URLs to feed to the AllRecipesProxy
         bingProxy = new BingProxy();
-        
+        bf = new BusyFlag();
+        recipeList = new HashMap();
         running = true;
         
-        bf = new BusyFlag();
-        
-        recipeList = new HashMap();
-        
+        // Fill the recipeList if we have something to 
         fillRecipeList(directoryPath);
             
+        // Start the Thread
         this.start();
     }
     
+    
+    // This is where the main action of the class happens.
     @Override
     public void run()
     {
@@ -98,8 +131,12 @@ public class RecipeManager extends Thread
         HashMap<String, String> recipeHash;
         int rndIndex;
         
+        // Continue until running is falase.
         while(running)
         {
+            // Don't proceed if we have as many recipes as we want.
+            // Sleep briefly so that this thread doesn't swallow up processor
+            // resources.
             if(recipeList.size() == MAX_RECIPES)
             {   try
                 {
@@ -111,6 +148,7 @@ public class RecipeManager extends Thread
                 continue;
             }
                 
+            // Make sure no other thread can move while we do the following
             bf.getBusyFlag();
             
             try 
@@ -126,22 +164,29 @@ public class RecipeManager extends Thread
                 rndIndex = (int)Math.random()*bingProxy.getSearchResults().size();
                 bingProxy.filterRecipes(rndIndex);
                 
+                // If we have no recipe URLs for this loop, start again.
                 if(bingProxy.getRecipeURLs().isEmpty())
                     continue;
                 
+                //  Use each of the URLs we found
                 for(String url:bingProxy.getRecipeURLs())
                 {
+                    // Get a recipe from allrecipes.com
                     recipeHash = allRecipesProxy.generateRecipe(url, current_request_url);
                     
+                    // If the recipe is null, continue to the next URL from
+                    // the BingProxy
                     if(recipeHash == null)
                         continue;
                     
+                    // Only save recipes that are unique
                     if(!recipeList.containsKey(recipeHash.get("title")))
                     {
                         System.out.println("Holding onto recipe: "+(String)recipeHash.get("title"));
                         recipeList.put(recipeHash.get("title"), recipeHash);
                     }
                     
+                    // If we have enough recipes, stop this inner loop.
                     if(recipeList.size() == MAX_RECIPES)
                     {
                         break;
@@ -154,11 +199,14 @@ public class RecipeManager extends Thread
                 // We really don't care if one pass fails
             }
             
+            // We are done searching for recipes, other threads can continue.
             bf.freeBusyFlag();
         }
             
     }
     
+    // Call this method to stop the run method.
+    // We need to put this Thread on hold before we can actually stop it.
     public void end()
     {
         bf.getBusyFlag();
@@ -169,6 +217,10 @@ public class RecipeManager extends Thread
 
     /**
      *
+     * This method searches the recipeList for those recipes that have 
+     * no more than "calories" calories per serving and "prepTime" minutes
+     * to prepare.  
+     * 
      * @param calories
      * @param prepTime
      * @return
@@ -181,37 +233,45 @@ public class RecipeManager extends Thread
         HashMap<String,String> recipe;
         int cal, pt;
         
+        // Stop other Threads while we do this.
         bf.getBusyFlag();
         
+        // Search through each of the recipes 
         for(String title:recipeList.keySet())
         {
+            // Get the calores and preptime for the recipe
             recipe = recipeList.get(title);
             cal = Integer.parseInt((String)recipe.get("calories"));
             pt = Integer.parseInt((String)recipe.get("preptime"));
                 
+            // Hold onto those recipes whose calories and prep time are less 
+            // or equal to the input parameter values.
             if(cal <= calories &&
                pt <= prepTime &&
                recipe.get("error") == null)
             {
                 recipesToReturn.add(recipe);
                 itemsToRemove.add(title);
-                recipeCount++;
             }   
              
-            if(recipeCount == RECIPE_COUNT)
+            // Only search RECIPE_COUNT times
+            if(recipeCount++ == RECIPE_COUNT)
                 break;
         }
         
+        // Remove the recipes we found from the recipeList
         for(String item:itemsToRemove)
         {
             recipeList.remove(item);
         }
         
+        // Free up other Threads when we are done here.
         bf.freeBusyFlag();
         
         return recipesToReturn;
     }
     
+    // This method reads in the contents of the recipeList from a file.
     public void fillRecipeList(String directoryPath)
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -223,6 +283,7 @@ public class RecipeManager extends Thread
         Node recipeNode, tempNode;
         String urlValue=null;
         
+        // Read in the contents from an XML file.
         try 
         {
             db = dbf.newDocumentBuilder();
@@ -251,17 +312,26 @@ public class RecipeManager extends Thread
         }
     }
     
+    // This method saves the contents of the recipeList.
+    // This method likely will only be called when the ILMenuServlet is stopped.
     public void serializeRecipeList(String directoryPath)
     {
         BufferedWriter bw;
         HashMap<String,String> recipe;
-             
-        try
+        File oldRecipeFile = new File(directoryPath+"/conf/recipelist.xml");
+        File newRecipeFile = new File(directoryPath+"/conf/recipelist.xml");
+        
+        // Delete any file that already exists.  We want to overwrite the 
+        // contents.
+        if(oldRecipeFile.exists())
+            oldRecipeFile.delete();
+        
+        // Write out the contents of the recipeList as an XML file.
+        try 
         {
-            bw = new BufferedWriter(
-                 new FileWriter(
-                 new File(directoryPath+"/conf/recipelist.xml")));
+            bw = new BufferedWriter(new FileWriter(newRecipeFile));
             
+            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
             bw.write("<recipes>\r\n");
         
             for(String keyOne:recipeList.keySet())
@@ -277,6 +347,9 @@ public class RecipeManager extends Thread
             }
         
             bw.write("</recipes>");
+            
+            bw.flush();
+            bw.close();
             
         } catch (IOException ioe)
         {
