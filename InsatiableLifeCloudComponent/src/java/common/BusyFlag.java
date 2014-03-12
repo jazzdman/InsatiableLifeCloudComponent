@@ -1,68 +1,92 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+package xml_mngr;
 
-package common;
 
-/**
- *
- * @author jazzdman
+/* Purpose : A helper class to enable thread safety with our XMLManagers.
+ *           Allows for an a mutex lock to be maintained over multiple
+ *           method calls.
+ *           This class is copied directly from Chapter 4 of Java Threads, 
+ *           2nd edition, O'Reilly Media Inc., January 1999. 
  */
 public class BusyFlag 
 {
-    private Thread busyFlag;
-    
+    //A reference to the thread that holds the flag
+    private Thread busyflag;
+
+    /* Purpose : Constructor
+     * Method  : Initialize member variables
+     * Returns : Nothing
+     */
     public BusyFlag()
     {
-        busyFlag = null;
+	busyflag = null;
     }
-    
-    public synchronized void getBusyFlag()
+
+    /* Purpose : Attempt to get the busy flag, 
+     * Method  : Call tryGetBusyFlag, wait while the
+     *           method returns false
+     * Returns : Nothing
+     */
+    public synchronized void getBusyFlag() 
     {
-        while(tryGetBusyFlag() == false)
-        {
-            try
+        while (tryGetBusyFlag() == false) 
+	{
+            try 
             {
                 wait();
-            }
-             catch(InterruptedException e)
-            {
-                
-            }
+            } 
+	    catch (Exception e) 
+	    {
+	    }
         }
-       
-        
     }
-    
-    public synchronized boolean tryGetBusyFlag()
+
+    /* Purpose : Attempt to take possession of the busyFlag
+     * Method  : Check to see if the current Thread is the one
+     *           holding the flag
+     * Returns : Whether the calling Thread is the holder of
+     *           the busy flag.
+     */
+    public synchronized boolean tryGetBusyFlag() 
     {
-        if(busyFlag == null)
+        if (busyflag == null) 
         {
-            busyFlag = Thread.currentThread();
+            busyflag = Thread.currentThread();
             return true;
         }
-        
-        if(busyFlag == Thread.currentThread())
-        {
+
+        if (busyflag == Thread.currentThread()) 
+	{
             return true;
         }
-        
+
+		
         return false;
     }
-    
-    public synchronized void freeBusyFlag()
+
+    /* Purpose : Attempt to free the busy flag
+     * Method  : If the calling thread is the one calling
+     *           this method, release the flag and alert 
+     *           any other waiting Threads.
+     * Returns : Nothing
+     */
+    public synchronized void freeBusyFlag() 
     {
-        if(getBusyFlagOwner() == Thread.currentThread())
-        {
-            busyFlag = null;
+        if (getBusyFlagOwner() == Thread.currentThread()) 
+	{            
+            busyflag = null;
             notify();
+            
         }
     }
-    
-    public synchronized Thread getBusyFlagOwner()
+
+    /* Purpose : Show which Thread has the busy flag
+     * Method  : Return a member variable
+     * Returns : A reference to the Thread currently
+     *           holding the busy flag.
+     */
+    public synchronized Thread getBusyFlagOwner() 
     {
-        return busyFlag;
+        return busyflag;
     }
+
 }
