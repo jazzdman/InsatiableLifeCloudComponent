@@ -1,7 +1,7 @@
-package xml_mngr;
+package common;
 
 
-/* Purpose : A helper class to enable thread safety with our XMLManagers.
+/* Purpose : A helper class to enable thread safety with RecipeManager.
  *           Allows for an a mutex lock to be maintained over multiple
  *           method calls.
  *           This class is copied directly from Chapter 4 of Java Threads, 
