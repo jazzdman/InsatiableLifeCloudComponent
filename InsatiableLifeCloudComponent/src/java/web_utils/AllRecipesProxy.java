@@ -21,9 +21,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
  * The purpose of this class is to interact with the allrecipes.com 
  * website and scrape HTML read from the allrecipes.com website.
  * Specifically, this class requests a recipe, scaled to a certain
- * number of servings. It the uses Regular Expression to check 
- * whether it can be prepared in a certain amount of time and has
- * only so many calories per serving.  Regular Expressions are then
+ * number of servings. Regular Expressions are then
  * used to find the title of the recipe and the ingredients.
  *
  * Potential improvements : add a second HashMap for recipe titles
@@ -48,11 +46,14 @@ public class AllRecipesProxy
 	return recipeList;
     }
 
+    // This method is used by ILMenuServlet.  It takes each recipe in 
+    // recipeHashes and sends a request to allrecipes.com to scale the request
+    // to "servings".
     public void generateRecipes(ArrayList<HashMap<String,String>> recipeHashes,
                                 int servings)
     {
         HashMap<String, Object> tempHash;
-        String tempString;
+        String title;
         
         for(HashMap<String, String> recipeHash:recipeHashes)
         {
@@ -62,8 +63,8 @@ public class AllRecipesProxy
                                   (String)recipeHash.get("referer"), 
                                   servings);
                 
-                tempString = (String)(String)tempHash.get("title");
-                if(tempString.matches(""))
+                title = (String)(String)tempHash.get("title");
+                if(title.matches(""))
                     continue;
                 
                 recipeList.add(tempHash);
@@ -77,10 +78,17 @@ public class AllRecipesProxy
         }
     }
     
-    public HashMap<String,Object> loadRecipeWithReferer(String url, String referer, int servings)
+    // This method is called by generateRecipes.  This method does the heavy 
+    // lifting of sending the request to allrecipes.com to get a scaled recipe.  
+    // It then uses Regular Expressions to collect the ingredients in the 
+    //recipe
+    public HashMap<String,Object> loadRecipeWithReferer(String url, 
+                                                        String referer, 
+                                                        int servings)
     {
         // The recipe URL with scaling factor added in
-	String urlString = url+"?scale="+new Integer(servings).toString()+"&ismetric=0";
+	String urlString = 
+                url+"?scale="+new Integer(servings).toString()+"&ismetric=0";
 	// The dictionary to pass back to the caller
 	HashMap<String,Object> recipeHash = new HashMap<>();
 	// A pointer to the HTML returned from allrecipes.com
@@ -126,9 +134,13 @@ public class AllRecipesProxy
         // In order for the strategy implemented in this method to work, we 
         // need to tell allRecipes.com that we are requesting the recipe from
         // the desktop version of Safari.
-        userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9) AppleWebKit/537.71 (KHTML, like Gecko) Version/7.0 Safari/537.71";
+        userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9)"
+                + " AppleWebKit/537.71 (KHTML, like Gecko) Version/7.0"
+                + "Safari/537.71";
         connection.setRequestProperty("User-Agent",userAgent);
-        connection.setRequestProperty("Accept", "application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
+        connection.setRequestProperty("Accept", 
+                "application/xml,application/xhtml+xml,text/html;"
+              + "q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
         connection.setRequestProperty("Accept-Language", "en-us");
 
         // Here we are telling the allrecipes.com webserver that we accept
@@ -142,7 +154,8 @@ public class AllRecipesProxy
         // back a gzip'ed response.
         try 
         {
-            gis = new GZIPInputStream(connection.getInputStream(), connection.getContentLength());
+            gis = new GZIPInputStream(connection.getInputStream(), 
+                      connection.getContentLength());
             in = new BufferedReader(new InputStreamReader(gis, "ISO-8859-1"));
             
         } 
@@ -249,8 +262,10 @@ public class AllRecipesProxy
     // that recipe is valid (i.e. the title is not empty and not a repeat).
     // If the recipe is valid, the recipe is added to recipeList.  For this
     // method a recipe is represented as a HashMap. 
-    public HashMap<String, String> generateRecipe(String url, String current_request_url)
-				throws MalformedURLException, IOException
+    public HashMap<String, String> generateRecipe(String url, 
+                                                  String current_request_url)
+                                                  throws MalformedURLException, 
+                                                  IOException
     {
 	HashMap<String,String> returnHash;
 
@@ -269,12 +284,9 @@ public class AllRecipesProxy
     }
 
     // This method is used to actually collect a recipe from allrecipes.com 
-    // scaled to "servings".  It then uses Regular Expression to check if
-    // the recipe has no more than "desiredCalories" calories per servings
-    // and takes no more than "desiredPrepTime" minutes to prepare.  Regular
-    // Expressions are then used to find the tile of the recipes and the
-    // ingredients in the recipe.  That information is loaded into a HashMap.
-    // That HashMap is then returned to the user.
+    // It then uses Regular Expression to find the calories per serving in a 
+    // recipe.  It also finds the prep time for the recipe.  That information 
+    // is loaded into a HashMap.  That HashMap is then returned to the user.
     public HashMap<String,String> loadRecipeWithReferer(String url,
 							  String referer)
     {

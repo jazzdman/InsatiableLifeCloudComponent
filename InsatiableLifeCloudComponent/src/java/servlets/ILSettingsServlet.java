@@ -13,7 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 
 /********************************************************************
  *
- * This class is responsible for responding to a web server request.
+ * The settings display in the client needs to know what the the limits are for:
+ * 
+ * calories per serving
+ * servings
+ * preparation time
+ * 
+ * The client makes a call to this servlet to find that information.
  * 
  ********************************************************************/
 @WebServlet(value="/settings")
@@ -32,6 +38,10 @@ public class ILSettingsServlet extends HttpServlet
     // Indicate an error in the init method
     private static final int SERVER_INIT_ERROR = -1;
 
+    // This method gets called the first time a request is made to the 
+    // servlet.  It is effectively the constructor for this class.  I use it
+    // to instantiate member variables.  Those instance variables are the
+    // values that the client setting screen will need.
     @Override
     public void init() throws ServletException
     {
@@ -71,12 +81,7 @@ public class ILSettingsServlet extends HttpServlet
 
     @Override
     // This method actually services the request that is made to the web
-    // server.  It uses the RecipeRequestConstructor to create a search URL
-    // to pass to Bing.  The BingProxy ucses the results from the 
-    // RecipeRequestConstructor to find allrecipes.com URLs.  The 
-    // AllRecipesProxy uses those URLs to find recipes that fall within
-    // the servings and calories requirements sent in the request.  The
-    // recipes that match the requirements are passed back in the response
+    // server.  The variables are passed back in the response
     // as XML.
     public void doGet(HttpServletRequest request,
 	     	      HttpServletResponse response) throws ServletException,

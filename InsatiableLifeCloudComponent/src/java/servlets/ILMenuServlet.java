@@ -57,14 +57,15 @@ public class ILMenuServlet extends HttpServlet
     
     private int maxPrepTime, minCalories, minServings;
 
+    // This method gets called the first time a request is made to the 
+    // servlet.  It is effectively the constructor for this class.  I use it
+    // to instantiate member variables.
     @Override
     public void init() throws ServletException
     {  
 	servletProblem = false;
         servletContext = getServletContext();
-
-	// Attempt to open the files that need to be passed to the 
-        // RecipeRequestConstructor
+        
 	try 
 	{
             maxPrepTime = Integer.parseInt(servletContext.getInitParameter("preptimeminutes")) +
@@ -95,13 +96,11 @@ public class ILMenuServlet extends HttpServlet
 
     @Override
     // This method actually services the request that is made to the web
-    // server.  It uses the RecipeRequestConstructor to create a search URL
-    // to pass to Bing.  The BingProxy ucses the results from the 
-    // RecipeRequestConstructor to find allrecipes.com URLs.  The 
-    // AllRecipesProxy uses those URLs to find recipes that fall within
-    // the servings and calories requirements sent in the request.  The
-    // recipes that match the requirements are passed back in the response
-    // as XML.
+    // server.  It searches for recipes in the RecipeManager that conform to
+    // prep time and calorie constraints passed in with the request.  The 
+    // AllRecipesProxy is then used to scale the recipes from RecipeManager 
+    // to the desired number of servings.  The scaled recipes that match the 
+    // requirements are passed back in the response as XML.
     public void doGet(HttpServletRequest request,
 	     	      HttpServletResponse response) throws ServletException,
 							 IOException
