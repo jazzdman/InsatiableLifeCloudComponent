@@ -114,12 +114,5 @@ public class ILSettingsServlet extends HttpServlet
         }
     }
 
-    @Override
-    // Where the servlet closes any persistent objects
-    public void destroy()
-    {
-
-    }
-
    
 }
