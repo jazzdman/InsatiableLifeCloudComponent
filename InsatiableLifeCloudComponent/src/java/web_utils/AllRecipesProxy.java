@@ -115,7 +115,6 @@ public class AllRecipesProxy
         // look like we're sending this from a web browser.
         try 
         {
-            //System.out.println("URL : " + url);
             connection = (HttpURLConnection)new URL(urlString).openConnection();
         }
         // If we encounter an exception here, we can't collect a recipe.
@@ -175,6 +174,7 @@ public class AllRecipesProxy
             // recipe to an empty string.
             catch(IOException e)
             {
+                connection.disconnect();
                 recipeHash.put("title", "");
                 return recipeHash;
             }	
@@ -186,6 +186,7 @@ public class AllRecipesProxy
         // recipe to an empty string.
         catch(IOException e)
         {
+            connection.disconnect();
             recipeHash.put("title", "");
             return recipeHash;
         }
@@ -205,6 +206,7 @@ public class AllRecipesProxy
         // recipe to an empty string.
         catch(IOException e)
         {
+            connection.disconnect();
             recipeHash.put("title", "");
             return recipeHash;
         }
@@ -320,7 +322,6 @@ public class AllRecipesProxy
 	// look like we're sending this from a web browser.
 	try 
 	{
-	    //System.out.println("URL : " + url);
 	    connection = (HttpURLConnection)new URL(url).openConnection();
 	}
 	// If we encounter an exception here, we can't collect a recipe.
@@ -377,6 +378,7 @@ public class AllRecipesProxy
 	    // recipe to an empty string.
 	    catch(IOException e)
 	    {
+                connection.disconnect();
 		//e.printStackTrace();
                 recipeHash.put("error",e.getMessage());
 		recipeHash.put("title","");
@@ -391,6 +393,7 @@ public class AllRecipesProxy
 	catch(IOException e)
 	{
 	    //e.printStackTrace();
+            connection.disconnect();
             recipeHash.put("error",e.getMessage());
 	    recipeHash.put("title","");
 	    return recipeHash;
@@ -403,7 +406,6 @@ public class AllRecipesProxy
 	    {
 		recipePage.append(tmp);
 	    }
-	    //System.out.println("Recipe page: "+ recipePage);
 	}
 	// If we encounter an exception here, we can't collect a recipe.
 	// We don't need to collect every single recipe, so we can bail at 
@@ -411,6 +413,7 @@ public class AllRecipesProxy
         // recipe to an empty string.
 	catch(IOException e)
 	{
+            connection.disconnect();
 	    //e.printStackTrace();
             recipeHash.put("error",e.getMessage());
 	    recipeHash.put("title","");
@@ -478,7 +481,6 @@ public class AllRecipesProxy
 	matches = new ArrayList<>();
 	while(mtchr.find())
 	{
-	    //System.out.println("Time string :" + mtchr.group(1));
             tmpMatch1 = mtchr.group(1);
             if(tmpMatch1 != null)
                 matches.add(tmpMatch1);
@@ -526,7 +528,6 @@ public class AllRecipesProxy
 	// If we got here, we couldn't find the title for the recipe.
 	else 
 	{
-	    //System.out.println("Couldn't find title.");
             recipeHash.put("error","Couldn't find title.");
 	    recipeHash.put("title","");
 	    return recipeHash;
