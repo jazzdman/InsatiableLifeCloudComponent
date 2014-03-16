@@ -34,7 +34,7 @@ public class BusyFlag
             {
                 wait();
             } 
-	    catch (Exception e) 
+	    catch (InterruptedException e) 
 	    {
 	    }
         }
