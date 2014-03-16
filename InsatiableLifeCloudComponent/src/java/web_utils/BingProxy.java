@@ -56,8 +56,7 @@ public class BingProxy
     // This method is called to actually carry out the search for
     // allrecipes.com URLs using Bing.  It uses Regular Expressions
     // to grab a random page of Bing results.
-    public void findRecipes(String searchString) throws MalformedURLException,
-							IOException
+    public void findRecipes(String searchString) 
     {
 	// The RE that finds the various pages from the search results
 	String pageRegex = "<a href=\"(/search[^\"]*)\"[^>]*>\\d</a>";
@@ -68,32 +67,55 @@ public class BingProxy
 	recipeURLs.clear();
 	
 	// Open a connection to Bing 
-	connection = 
+        try
+        {    
+            connection = 
 	    (HttpURLConnection)new URL(searchString).openConnection();
 
-	// Create a BufferedReader from the connection made to Bing
-	in = new BufferedReader(
+        } catch (IOException e)
+        {
+            if(connection != null)
+               connection.disconnect();
+            
+            return;
+        }
+        
+        try
+        {
+            // Create a BufferedReader from the connection made to Bing
+            in = new BufferedReader(
 		 new InputStreamReader(
 		     connection.getInputStream()));
+        } catch(IOException e)
+        {
+            connection.disconnect();
+            return;
+        }
 
 
 	// Read the results from Bing
-	while((tmp = in.readLine()) != null)
-	{
-	    bingPage.append(tmp).append("\r\n)");
-	}
+        try
+        {
+            while((tmp = in.readLine()) != null)
+            {
+                bingPage.append(tmp).append("\r\n)");
+            }
+        } catch (IOException e)
+        {
+            connection.disconnect();
+            return;
+        }
+        
 
 	// Close that HTTPURLConnection
 	connection.disconnect();
 
 	// Get the links to all the pages of Bing results
-	//NSLog(@"bing page %@.", bingPage);
         ptrn = Pattern.compile(pageRegex, Pattern.DOTALL);
 	mtchr = ptrn.matcher(bingPage);
 	
 	while(mtchr.find())
 	{
-	    //System.out.println(mtchr.group(1)+"\r\n");
 	    searchResults.add(mtchr.group(1));
 	}
     }
@@ -108,8 +130,7 @@ public class BingProxy
     // This method was split off from the findRecipes method to enable
     // unit testing of this class.  This method scrapes out the actual 
     // allrecipes.com URLs from a random Bing page.
-    public void filterRecipes(int rndIndex) throws MalformedURLException,
-							IOException
+    public void filterRecipes(int rndIndex)
     {
         URL tempURL1;
         String tmp;
@@ -125,22 +146,44 @@ public class BingProxy
             tmp = (String)searchResults.get(rndIndex);
 
 	    // Create a URL based on the random result
-	    tempURL1 = 
+            try
+            {
+                tempURL1 = 
 		new URL("http://" + connection.getURL().getHost() + tmp);
+            } catch(MalformedURLException e)
+            {
+                return;
+            }
 
 	    
 	    // Read the contents of that randomly selected page
-	    connection = (HttpURLConnection)tempURL1.openConnection();
-	    in = new BufferedReader(
+            try
+            {
+                connection = (HttpURLConnection)tempURL1.openConnection();
+                in = new BufferedReader(
 		     new InputStreamReader(
 		         connection.getInputStream()));
-
-	    while((tmp = in.readLine()) != null)
-	    {
-		bingPage.append(tmp).append("\r\n)");
-	    }
-
-	    connection.disconnect();
+            } catch(IOException e)
+            {
+                if(connection != null)
+                    connection.disconnect();
+                return;
+            }
+            
+            
+            
+            try
+            {
+                while((tmp = in.readLine()) != null)
+                {
+                    bingPage.append(tmp).append("\r\n)");
+                }
+            } catch (IOException e)
+            {
+                
+            }
+            connection.disconnect();
+	    
         }   
 
 	// Find the recipe URLs from allrecipes.com
@@ -150,7 +193,6 @@ public class BingProxy
 	
 	while(mtchr.find())
 	{
-	    //System.out.println(mtchr.group(1)+"\r\n");
             tmp = mtchr.group(1);
             tmp = tmp.toLowerCase();
             if(!recipeURLs.containsKey(tmp))
