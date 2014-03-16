@@ -41,7 +41,7 @@ import common.BusyFlag;
  * 
  * @author jazzdman
  */
-public class RecipeManager extends Thread
+public class RecipeManager implements Runnable
 {
     
     // A temporary path to open files on the server
@@ -93,10 +93,12 @@ public class RecipeManager extends Thread
     //
     public RecipeManager(String directoryPath) throws IOException
     {
-        filePath = new StringBuffer();
         
+        filePath = new StringBuffer();
         filePath.append(directoryPath);
         filePath.append("WEB-INF/conf/dishes.txt");
+        running = true;
+          
 	dishes = Files.readAllLines(Paths.get(filePath.toString()),
 					StandardCharsets.US_ASCII);
         filePath.delete(0, filePath.length());
@@ -105,7 +107,8 @@ public class RecipeManager extends Thread
         filePath.append("WEB-INF/conf/ingredients.txt");
 	ingredients = Files.readAllLines(Paths.get(filePath.toString()),
 					StandardCharsets.US_ASCII);
-            
+       
+        
         // Instantiate member variables
         recipeRequestConstructor = 
                     new RecipeRequestConstructor(dishes, ingredients);
@@ -113,13 +116,10 @@ public class RecipeManager extends Thread
         bingProxy = new BingProxy();
         bf = new BusyFlag();
         recipeList = new HashMap();
-        running = true;
         
         // Fill the recipeList if we have something to 
         fillRecipeList(directoryPath);
             
-        // Start the Thread
-        this.start();
     }
     
     
@@ -127,7 +127,7 @@ public class RecipeManager extends Thread
     @Override
     public void run()
     {
-        String current_request_url;
+        String current_request_url, tmpTitle;
         HashMap<String, String> recipeHash;
         int rndIndex;
         
@@ -174,9 +174,13 @@ public class RecipeManager extends Thread
                     // Get a recipe from allrecipes.com
                     recipeHash = allRecipesProxy.generateRecipe(url, current_request_url);
                     
-                    // If the recipe is null, continue to the next URL from
-                    // the BingProxy
+                    // Throw out recipes that have problems
                     if(recipeHash == null)
+                        continue;
+                    
+                    tmpTitle = (String) recipeHash.get("title");
+                    if(recipeHash.get("error") != null ||
+                       tmpTitle.matches(""))
                         continue;
                     
                     // Only save recipes that are unique
@@ -272,7 +276,7 @@ public class RecipeManager extends Thread
     }
     
     // This method reads in the contents of the recipeList from a file.
-    public void fillRecipeList(String directoryPath)
+    private void fillRecipeList(String directoryPath)
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
