@@ -37,4 +37,9 @@
             30
         </session-timeout>
     </session-config>
+    <listener>
+        <listener-class>
+            servlets.MenuListener
+        </listener-class>
+    </listener>
 </web-app>
