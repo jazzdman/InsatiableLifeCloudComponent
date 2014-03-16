@@ -73,17 +73,12 @@ public class ILMenuServlet extends HttpServlet
             minServings = Integer.parseInt(servletContext.getInitParameter("servings"));
             minCalories = Integer.parseInt(servletContext.getInitParameter("calories"));
             
-    
-            RecipeManager rm = new RecipeManager(servletContext.getRealPath("/"));
-            servletContext.setAttribute("rm", rm);
-            
 	}
 	// If we hit an exception here, we really can't do anything with
 	// the servlet.  Stop at this point.
-	catch(Exception e)
+	catch(NumberFormatException e)
 	{
 	    servletProblem = true;
-	    return;
 	}
     }
 
@@ -107,113 +102,100 @@ public class ILMenuServlet extends HttpServlet
     {
         String encodedString;
 	response.setContentType("text/xml");
-	PrintWriter writer = response.getWriter();
-	List<String> ingredientArray;
-        ArrayList<HashMap<String,String>> recipeList;
-        RecipeManager recipeManager = (RecipeManager)servletContext.getAttribute("rm");
-        AllRecipesProxy arp = new AllRecipesProxy();
-        
-	
-        // Start the XML document
-        writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-        writer.print("<recipes>\r\n");
-        
-        // Don't return any results if we had a problem starting the servlet.
-        // Indicate servlet error with count of -1
-        if (servletProblem || recipeManager == null)
-        {
-            writer.print("<count>"+ new Integer(SERVER_INIT_ERROR).toString()+"</count>");
-            writer.print("</recipes>");
-            return;
-        }
-
-	
-
-        try
-	{   
-             // Check to make sure the request parameters are named correctly 
-            // and have acceptable values.
-	    if (!validateRequest(request))
-	    {   
-		writer.print("<count>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</count>");
+        try (PrintWriter writer = response.getWriter()) {
+            List<String> ingredientArray;
+            ArrayList<HashMap<String,String>> recipeList;
+            RecipeManager recipeManager = (RecipeManager)servletContext.getAttribute("rm");
+            AllRecipesProxy arp = new AllRecipesProxy();
+            
+            
+            // Start the XML document
+            writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+            writer.print("<recipes>\r\n");
+            
+            // Don't return any results if we had a problem starting the servlet.
+            // Indicate servlet error with count of -1
+            if (servletProblem || recipeManager == null)
+            {
+                writer.print("<count>"+ new Integer(SERVER_INIT_ERROR).toString()+"</count>");
                 writer.print("</recipes>");
-		return;
-	    }
+                return;
+            }
             
             
-	}
-	// If we hit a problem, don't do anything. We want to return
-	// whatever we did find.
-	catch(Exception e)
-	{
-            writer.print("<count>"+ new Integer(SERVER_COLLECT_ERROR).toString()+"</count>");
+            
+            try
+            {
+                // Check to make sure the request parameters are named correctly
+                // and have acceptable values.
+                if (!validateRequest(request))
+                {
+                    writer.print("<count>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</count>");
+                    writer.print("</recipes>");
+                    return;
+                }
+                
+                
+            }
+            // If we hit a problem, don't do anything. We want to return
+            // whatever we did find.
+            catch(Exception e)
+            {
+                writer.print("<count>"+ new Integer(SERVER_COLLECT_ERROR).toString()+"</count>");
+                writer.print("</recipes>");
+                return;
+            }
+            
+            recipeList = recipeManager.getRecipes(calories, prepTime);
+            
+            arp.generateRecipes(recipeList, servings);
+            
+            for(HashMap<String,Object> recipe:arp.getRecipeList())
+            {
+                
+                if(recipe.get("error") != null ||
+                        recipe.get("ingredients") == null ||
+                        recipe.get("title") == null ||
+                        recipe.get("url") == null ||
+                        recipe.get("page") == null)
+                {
+                    servletContext.log("Found recipe that has a problem.");
+                    continue;
+                }
+                // Get the list of ingredients
+                ingredientArray = (List<String>)recipe.get("ingredients");
+                
+                // Create a recipe Node
+                writer.print("<recipe>\r\n");
+                // Write out the title for the recipe
+                writer.print("<title><![CDATA[ "+(String)recipe.get("title")+" ]]></title>\r\n");
+                // Write out the URL for the recipe
+                writer.print("<url><![CDATA[ "+(String)recipe.get("url")+" ]]></url>\r\n");
+                
+                // Try to gzip the page HTML
+                try
+                {
+                    encodedString = compress((String)recipe.get("page"));
+                    writer.print("<page><![CDATA[ "+ encodedString +" ]]></page>\r\n");
+                }
+                // If that fails just write the page HTML to the document
+                catch(Exception e)
+                {
+                    writer.print("<page><![CDATA[ "+(String)recipe.get("page")+" ]]></page>\r\n");
+                }
+                
+                for(String ingredient:ingredientArray)
+                {
+                    writer.print("<ingredient><![CDATA[ "+ingredient+" ]]></ingredient>\r\n");
+                }
+                
+                writer.print("</recipe>\r\n");
+            }
             writer.print("</recipes>");
-            return;
-	}
-
-        recipeList = recipeManager.getRecipes(calories, prepTime);
-        
-        arp.generateRecipes(recipeList, servings);
-        
-	for(HashMap<String,Object> recipe:arp.getRecipeList())
-	{
-
-           if(recipe.get("error") != null ||
-              recipe.get("ingredients") == null ||
-              recipe.get("title") == null ||
-              recipe.get("url") == null ||
-              recipe.get("page") == null)
-           {	
-               servletContext.log("Found recipe that has a problem.");
-               continue;
-           } 
-           // Get the list of ingredients
-	   ingredientArray = (List<String>)recipe.get("ingredients");
-           
-	   // Create a recipe Node
-           writer.print("<recipe>\r\n");
-	   // Write out the title for the recipe
-	   writer.print("<title><![CDATA[ "+(String)recipe.get("title")+" ]]></title>\r\n");
-	   // Write out the URL for the recipe
-	   writer.print("<url><![CDATA[ "+(String)recipe.get("url")+" ]]></url>\r\n");
-
-	   // Try to gzip the page HTML
-	   try 
-           {
-	   	encodedString = compress((String)recipe.get("page"));
-	   	writer.print("<page><![CDATA[ "+ encodedString +" ]]></page>\r\n");
-	   }
-	   // If that fails just write the page HTML to the document
-	   catch(Exception e)
-	   {
-	   	writer.print("<page><![CDATA[ "+(String)recipe.get("page")+" ]]></page>\r\n");
-	   }
-           
-	   for(String ingredient:ingredientArray)
-	   {
-	       writer.print("<ingredient><![CDATA[ "+ingredient+" ]]></ingredient>\r\n");
-	   }
-
-	   writer.print("</recipe>\r\n");	
-	}
-	writer.print("</recipes>");
-
-	// Clear out all the recipes we just sent back
-	arp.getRecipeList().clear();
-
-	//close the writer
-	writer.close();
-    }
-
-    @Override
-    // Where the servlet closes any persistent objects
-    public void destroy()
-    {
-        RecipeManager rm = (RecipeManager)servletContext.getAttribute("rm");
-        rm.end();
-        rm.serializeRecipeList(servletContext.getRealPath("/"));
-        
-        servletContext.removeAttribute("rm");
+            
+            // Clear out all the recipes we just sent back
+            arp.getRecipeList().clear();
+        }
     }
 
     // This method breaks apart the query string ?X=A&Y=B&Z=C 
