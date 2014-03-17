@@ -276,10 +276,10 @@ public class AllRecipesProxy
 
 	// Do not proceed if the recipe title is empty.  This means
 	// that something went wrong when trying to collect the recipe
-        if(((String)returnHash.get("title")).equals(""))
-	{ 
-	    return null;
-	}
+        //if(((String)returnHash.get("title")).equals(""))
+	//{ 
+	//    return null;
+	//}
 
 	// return what we found
         return returnHash;
@@ -316,6 +316,7 @@ public class AllRecipesProxy
 	Pattern ptrn;
 	Matcher mtchr;
         String tmpMatch1;
+        int tempHr, tempMin;
         
 
 	// Create a request and set header fields to make it 
@@ -491,10 +492,15 @@ public class AllRecipesProxy
 	if (matches.size() > 0) 
 	{
 	    // If there are hours listed, we have too many minutes.
-	    if (matches.get(0).split(" ").length > 2 ||
-		matches.get(0).matches("Hr")) {
-                recipeHash.put("error","Too many minutes. "+matches.get(0));
-	    } else 
+	    if (matches.get(0).split(" ").length == 2 &&
+		matches.get(0).lastIndexOf("Hr") > 0) {
+                tempHr = Integer.parseInt(matches.get(0).split(" ")[0]);
+                recipeHash.put("preptime", new Integer(tempHr*60).toString());
+	    } else if (matches.get(0).split(" ").length > 2){
+                tempHr = Integer.parseInt(matches.get(0).split(" ")[0]);
+                tempMin = Integer.parseInt(matches.get(0).split(" ")[2]);
+                recipeHash.put("preptime", new Integer(tempHr*60 + tempMin).toString());
+            } else 
             {
             
                 recipeHash.put("preptime",matches.get(0).split(" ")[0]);
