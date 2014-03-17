@@ -44,11 +44,14 @@ public class MenuListener implements ServletContextListener
     {
         ServletContext servletContext = sce.getServletContext();
         RecipeManager rm;
+        Thread th;
         
         try
         {
             rm = new RecipeManager(servletContext.getRealPath("/"));
-            new Thread(rm).start();
+            th = new Thread(rm);
+            th.setDaemon(true);
+            th.start();
         } catch (IOException e)
         {
             rm = null;
