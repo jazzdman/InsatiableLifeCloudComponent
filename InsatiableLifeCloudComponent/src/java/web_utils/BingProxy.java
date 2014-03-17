@@ -65,6 +65,7 @@ public class BingProxy
         
 	// Remove any URLs that are already stored
 	recipeURLs.clear();
+        searchResults.clear();
 	
 	// Open a connection to Bing 
         try
