@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -43,6 +44,8 @@ import common.BusyFlag;
  */
 public class RecipeManager implements Runnable
 {
+    
+    private Random rnd;
     
     // A temporary path to open files on the server
     private StringBuffer filePath;
@@ -93,6 +96,7 @@ public class RecipeManager implements Runnable
     //
     public RecipeManager(String directoryPath) throws IOException
     {
+        rnd = new Random(System.currentTimeMillis());
         
         filePath = new StringBuffer();
         filePath.append(directoryPath);
@@ -161,7 +165,7 @@ public class RecipeManager implements Runnable
                 
                 // Get a random number based on the number of search
                 // results
-                rndIndex = (int)Math.random()*bingProxy.getSearchResults().size();
+                rndIndex = (int)rnd.nextDouble()*bingProxy.getSearchResults().size();
                 bingProxy.filterRecipes(rndIndex);
                 
                 // If we have no recipe URLs for this loop, start again.
@@ -176,17 +180,24 @@ public class RecipeManager implements Runnable
                     
                     // Throw out recipes that have problems
                     if(recipeHash == null)
+                    {
                         continue;
+                    }
                     
                     tmpTitle = (String) recipeHash.get("title");
-                    if(recipeHash.get("error") != null ||
-                       tmpTitle.matches(""))
+                    if(recipeHash.get("error") != null )
+                    {
                         continue;
+                    }
+                       
+                    if(tmpTitle.matches(""))
+                    {
+                        continue;
+                    }
                     
                     // Only save recipes that are unique
                     if(!recipeList.containsKey(recipeHash.get("title")))
                     {
-                        System.out.println("Holding onto recipe: "+(String)recipeHash.get("title"));
                         recipeList.put(recipeHash.get("title"), recipeHash);
                     }
                     
