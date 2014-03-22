@@ -133,22 +133,33 @@ public class RecipeManager implements Runnable
     {
         String current_request_url, tmpTitle;
         HashMap<String, String> recipeHash;
-        int rndIndex;
+        int rndIndex, sleepTime;
         
         // Continue until running is falase.
         while(running)
         {
+            if(recipeList.size() == MAX_RECIPES)
+            {
+                sleepTime = 1000;
+            } else
+            {
+                sleepTime = 100;
+            }
+                
+                
+            try
+            {
+                Thread.sleep(sleepTime);
+            } catch (Exception e)
+            {
+                // If we can't sleep, it's no big deal
+            }
+            
             // Don't proceed if we have as many recipes as we want.
             // Sleep briefly so that this thread doesn't swallow up processor
             // resources.
             if(recipeList.size() == MAX_RECIPES)
-            {   try
-                {
-                   Thread.sleep(10);
-                } catch (Exception e)
-                {
-                    // If we can't sleep, it's no big deal
-                }
+            {  
                 continue;
             }
                 
@@ -170,7 +181,11 @@ public class RecipeManager implements Runnable
                 
                 // If we have no recipe URLs for this loop, start again.
                 if(bingProxy.getRecipeURLs().isEmpty())
+                {
+                    bf.freeBusyFlag();
                     continue;
+                }
+                    
                 
                 //  Use each of the URLs we found
                 for(String url:bingProxy.getRecipeURLs())
