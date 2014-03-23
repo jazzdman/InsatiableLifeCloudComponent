@@ -100,64 +100,59 @@ public class ILMenuServlet extends HttpServlet
 	     	      HttpServletResponse response) throws ServletException,
 							 IOException
     {
+        StringBuffer responseString = new StringBuffer();
         String encodedString;
-	response.setContentType("text/xml");
-        try (PrintWriter writer = response.getWriter()) {
-            List<String> ingredientArray;
-            ArrayList<HashMap<String,String>> recipeList;
-            RecipeManager recipeManager = (RecipeManager)servletContext.getAttribute("rm");
-            AllRecipesProxy arp = new AllRecipesProxy();
+        List<String> ingredientArray;
+        ArrayList<HashMap<String,String>> recipeList;
+        RecipeManager recipeManager = (RecipeManager)servletContext.getAttribute("rm");
+        AllRecipesProxy arp = new AllRecipesProxy();
+        boolean stillOK = true;
+        
+        // Start the XML document
+        responseString.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        responseString.append("<recipes>");
             
+        // Don't return any results if we had a problem starting the servlet.
+        // Indicate servlet error with count of -1
+        if (servletProblem || recipeManager == null)
+        {
+            responseString.append("<count>"+ new Integer(SERVER_INIT_ERROR).toString()+"</count>");
+            responseString.append("</recipes>");
+            stillOK = false;
+        }
             
-            // Start the XML document
-            writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-            writer.print("<recipes>\r\n");
-            
-            // Don't return any results if we had a problem starting the servlet.
-            // Indicate servlet error with count of -1
-            if (servletProblem || recipeManager == null)
+        try
+        {
+            // Check to make sure the request parameters are named correctly
+            // and have acceptable values.
+            if (stillOK && !validateRequest(request))
             {
-                writer.print("<count>"+ new Integer(SERVER_INIT_ERROR).toString()+"</count>");
-                writer.print("</recipes>");
-                return;
+                responseString.append("<count>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</count>");
+                responseString.append("</recipes>");
+                stillOK = false;
             }
-            
-            
-            
-            try
-            {
-                // Check to make sure the request parameters are named correctly
-                // and have acceptable values.
-                if (!validateRequest(request))
-                {
-                    writer.print("<count>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</count>");
-                    writer.print("</recipes>");
-                    return;
-                }
-                
-                
-            }
-            // If we hit a problem, don't do anything. We want to return
-            // whatever we did find.
-            catch(Exception e)
-            {
-                writer.print("<count>"+ new Integer(SERVER_COLLECT_ERROR).toString()+"</count>");
-                writer.print("</recipes>");
-                return;
-            }
-            
+        }
+        // If we hit a problem, don't do anything. We want to return
+        // whatever we did find.
+        catch(Exception e)
+        {
+           responseString.append("<count>"+ new Integer(SERVER_COLLECT_ERROR).toString()+"</count>");
+           responseString.append("</recipes>");
+           stillOK = false;
+        }
+        
+        if(stillOK)
+        {
             recipeList = recipeManager.getRecipes(calories, prepTime);
-            
             arp.generateRecipes(recipeList, servings);
             
             for(HashMap<String,Object> recipe:arp.getRecipeList())
-            {
-                
+            {  
                 if(recipe.get("error") != null ||
-                        recipe.get("ingredients") == null ||
-                        recipe.get("title") == null ||
-                        recipe.get("url") == null ||
-                        recipe.get("page") == null)
+                   recipe.get("ingredients") == null ||
+                   recipe.get("title") == null ||
+                   recipe.get("url") == null ||
+                   recipe.get("page") == null)
                 {
                     servletContext.log("Found recipe that has a problem.");
                     continue;
@@ -166,36 +161,42 @@ public class ILMenuServlet extends HttpServlet
                 ingredientArray = (List<String>)recipe.get("ingredients");
                 
                 // Create a recipe Node
-                writer.print("<recipe>\r\n");
+                responseString.append("<recipe>");
                 // Write out the title for the recipe
-                writer.print("<title><![CDATA[ "+(String)recipe.get("title")+" ]]></title>\r\n");
+                responseString.append("<title><![CDATA[ "+(String)recipe.get("title")+" ]]></title>");
                 // Write out the URL for the recipe
-                writer.print("<url><![CDATA[ "+(String)recipe.get("url")+" ]]></url>\r\n");
+                responseString.append("<url><![CDATA[ "+(String)recipe.get("url")+" ]]></url>");
                 
                 // Try to gzip the page HTML
                 try
                 {
                     encodedString = compress((String)recipe.get("page"));
-                    writer.print("<page><![CDATA[ "+ encodedString +" ]]></page>\r\n");
+                    responseString.append("<page><![CDATA[ "+ encodedString +" ]]></page>");
                 }
                 // If that fails just write the page HTML to the document
                 catch(Exception e)
                 {
-                    writer.print("<page><![CDATA[ "+(String)recipe.get("page")+" ]]></page>\r\n");
+                    responseString.append("<page><![CDATA[ "+(String)recipe.get("page")+" ]]></page>");
                 }
                 
                 for(String ingredient:ingredientArray)
                 {
-                    writer.print("<ingredient><![CDATA[ "+ingredient+" ]]></ingredient>\r\n");
+                    responseString.append("<ingredient><![CDATA[ "+ingredient+" ]]></ingredient>");
                 }
                 
-                writer.print("</recipe>\r\n");
+                responseString.append("</recipe>");
             }
-            writer.print("</recipes>");
-            
-            // Clear out all the recipes we just sent back
-            arp.getRecipeList().clear();
+            responseString.append("</recipes>");
         }
+        
+        try (PrintWriter writer = response.getWriter()) 
+        {    
+            response.setContentType("text/xml");
+            writer.print(responseString.toString());   
+        }
+        
+        // Clear out all the recipes we just sent back
+        arp.getRecipeList().clear();
     }
 
     // This method breaks apart the query string ?X=A&Y=B&Z=C 
