@@ -91,24 +91,24 @@ public class ILSettingsServlet extends HttpServlet
 	response.setContentType("text/xml");
         try (PrintWriter writer = response.getWriter()) 
         {
-            writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+            writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             
             if(servletProblem)
             {
                 writer.print("</params>");
-                writer.print("<param>"+ new Integer(SERVER_INIT_ERROR).toString() +"</param>\r\n");
+                writer.print("<param>"+ new Integer(SERVER_INIT_ERROR).toString() +"</param>");
                 writer.print("</params>");
                 return;
             }
             
             
-            writer.print("<params>\r\n");
+            writer.print("<params>");
             
-            writer.print("<preptime>"+ prepTime +"</preptime>\r\n");
+            writer.print("<preptime>"+ prepTime +"</preptime>");
             
-            writer.print("<servings>"+ servings +"</servings>\r\n");
+            writer.print("<servings>"+ servings +"</servings>");
             
-            writer.print("<calories>"+ calories +"</calories>\r\n");
+            writer.print("<calories>"+ calories +"</calories>");
             
             writer.print("</params>");
         }
