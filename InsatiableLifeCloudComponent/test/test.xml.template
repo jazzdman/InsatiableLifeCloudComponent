@@ -4,19 +4,26 @@
         <format property="test_output.date" pattern="MM-dd-yyyy" />
     </tstamp>
 
-    <target name="update">
-        <exec executable="/usr/bin/svn">
-            <arg value="update" />
-            <arg value="DIR_NAME" />
-        </exec>
-    </target>
-
-    <target name="compile" depends="update">
-	<javac srcdir="DIR_NAME/test" destdir="DIR_NAME/test" />
+    <target name="compile" >
+	<javac srcdir="DIR_NAME/test" 
+	       destdir="DIR_NAME/test" 
+               classpath="CLASSPATH">
+             <exclude name="*.txt" />
+             <exclude name="activation.jar" />
+             <exclude name="mail.jar" />
+             <exclude name="test.xml" />
+             <exclude name="test.xml.template" />
+             <exclude name="test_run.sh" />
+             <exclude name="web_utils/testSuiteRun.xml" />
+	     <exclude name="web_utils/BingProxyTestExpectedResults.xml" />
+        </javac>
     </target>
 
     <target name="test" depends="compile">
     	<junit printsummary="yes">
+            <classpath>
+		<pathelement path="JUNITPATH" />
+	    </classpath>	
   	    <formatter type="plain" />
             <test 
 	    	  name="web_utils.InsatiableLifeJUnitTest"
@@ -34,7 +41,8 @@
 	    mailport="465" 
 	    subject="Nightly test results for ${test_output.date}">
                 <to address="jazzdman@gmail.com" />
-                <message src="DIR_NAME/test/test_result.${test_output.date}" />
+                <from address="jazzdman@gmail.com" />
+                <message src="DIR_NAME/test/test_result.${test_output.date}.txt" />
         </mail>
     </target>
     
