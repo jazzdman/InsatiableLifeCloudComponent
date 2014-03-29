@@ -28,7 +28,7 @@
     	    ssl="yes" 
     	    mailhost="smtp.gmail.com" 
 	    mailport="465" 
-	    subject="Nightly test results">
+	    subject="Nightly test results for ${test_output.date}">
                 <to address="jazzdman@gmail.com" />
                 <message src="DIR_NAME/test/test_result.${test_output.date}">
         </mail>
