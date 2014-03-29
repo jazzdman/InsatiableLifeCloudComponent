@@ -11,7 +11,11 @@
         </exec>
     </target>
 
-    <target name="test" depends="update">
+    <target name="compile" depends="update">
+	<javac srcdir="DIR_NAME/test" destdir="DIR_NAME/test" />
+    </target>
+
+    <target name="test" depends="compile">
     	<junit printsummary="yes">
   	    <formatter type="plain" />
             <test 
