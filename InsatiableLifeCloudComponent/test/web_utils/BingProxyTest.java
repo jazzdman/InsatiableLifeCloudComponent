@@ -17,7 +17,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -66,7 +65,7 @@ public class BingProxyTest
             
         } catch (Exception e)
         {
-            fail("Unable to set up test");
+            fail("Unable to set up test."+ e.getMessage());
         }
     }
     

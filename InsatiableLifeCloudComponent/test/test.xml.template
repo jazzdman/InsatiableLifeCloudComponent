@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <tstamp> 
+        <format property="test_output.date" pattern="MM-dd-yyyy">
+    </tstamp>
+
+    <target name="update">
+        <exec executable="/usr/bin/svn">
+            <arg value="update">
+            <arg value="DIR_NAME">
+        </exec>
+    </target>
+
+    <target name="test" depends="update">
+    	<junit printsummary="yes">
+  	    <formatter type="plain" />
+            <test 
+	    	  name="web_utils.InsatiableLifeJUnitTest"
+		  outfile="test_result.${test_output.date}"
+		  todir="DIR_NAME/test" /> 
+        </junit>
+    </target>
+
+    <target name="output" depends"test">
+        <mail
+            user="jazzdman"
+	    password="XOnm6ibC"
+    	    ssl="yes" 
+    	    mailhost="smtp.gmail.com" 
+	    mailport="465" 
+	    subject="Nightly test results">
+                <to address="jazzdman@gmail.com" />
+                <message src="DIR_NAME/test/test_result.${test_output.date}">
+        </mail>
+    </target>
+    
+
+</project>

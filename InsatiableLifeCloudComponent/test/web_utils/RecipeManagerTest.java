@@ -6,12 +6,20 @@
 
 package web_utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -19,27 +27,57 @@ import static org.junit.Assert.*;
  */
 public class RecipeManagerTest {
     
+    HashMap<String, HashMap<String,String>> testList = new HashMap<>();
+    File testFile1, testFile2;
+    
     public RecipeManagerTest() {
     }
     
     @Before
     public void setUp() {
+         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db;
+        Document recipeDoc;
+        Element rootElement;
+        NodeList rcpList, recipeChildren;
+        HashMap<String,String> tempHash;
+        Node recipeNode, tempNode;
+        String urlValue=null;
+        
+        // Read in the contents from an XML file.
+        try 
+        {
+            db = dbf.newDocumentBuilder();
+            testFile1 = new File(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
+            recipeDoc = db.parse(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
+            testFile1.renameTo(new File(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist-test.xml"));
+            
+            rootElement = recipeDoc.getDocumentElement();
+            rcpList = rootElement.getElementsByTagName("recipe");
+            
+            for(int i = 0; i < rcpList.getLength(); i++)
+            {
+                recipeNode = rcpList.item(i);
+                recipeChildren = recipeNode.getChildNodes();
+                tempHash = new HashMap();
+                for(int j = 0; j < recipeChildren.getLength(); j++)
+                {
+                    tempNode = recipeChildren.item(j);
+                    if(tempNode.getNodeName().matches("url"))
+                        urlValue = tempNode.getNodeValue();
+                    tempHash.put(tempNode.getNodeName(), tempNode.getNodeValue());
+                }
+                
+                testList.put(urlValue, tempHash);
+            }
+        } catch (Exception e)
+        {
+            
+        }
     }
     
     @After
     public void tearDown() {
-    }
-
-    /**
-     * Test of run method, of class RecipeManager.
-     */
-    @Test
-    public void testRun() {
-        System.out.println("run");
-        RecipeManager instance = null;
-        instance.run();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -48,26 +86,43 @@ public class RecipeManagerTest {
     @Test
     public void testEnd() {
         System.out.println("end");
+        Thread th = null;
         RecipeManager instance = null;
-        instance.end();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        try
+        {
+            
+            instance = new RecipeManager(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/");
+            th = new Thread(instance);
+            
+            th.setDaemon(true);
+            th.start();
+            Thread.sleep(1000);
+            instance.end();
+            Thread.sleep(1000);
+            Assert.assertFalse(th.isAlive());
+            
+        } catch(Exception e)
+        {
+            fail("Failed to set up testEnd: "+ e.getMessage());
+        }
+        
     }
 
     /**
-     * Test of getRecipes method, of class RecipeManager.
+     * Test of fillRecipeList method, of class RecipeManager.
      */
     @Test
-    public void testGetRecipes() {
-        System.out.println("getRecipes");
-        int calories = 0;
-        int prepTime = 0;
+    public void testFillRecipeList() {
+        System.out.println("fillRecipeList");
         RecipeManager instance = null;
-        ArrayList<HashMap<String, String>> expResult = null;
-        ArrayList<HashMap<String, String>> result = instance.getRecipes(calories, prepTime);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        try
+        {
+            instance = new RecipeManager(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/");
+        } catch (Exception e)
+        {
+            fail("Failed to set up testFillRecipeList: "+ e.getMessage());
+        }    
+        Assert.assertEquals(testList, instance.getRecipeList() );
     }
 
     /**
@@ -76,11 +131,19 @@ public class RecipeManagerTest {
     @Test
     public void testSerializeRecipeList() {
         System.out.println("serializeRecipeList");
-        String directoryPath = "";
         RecipeManager instance = null;
-        instance.serializeRecipeList(directoryPath);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        testFile2 = new File(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
+        
+        try
+        {
+            instance = new RecipeManager(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/");
+            instance.serializeRecipeList(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/");
+            
+        } catch (Exception e)
+        {
+            fail("Failed to set up testSerializeReport: "+ e.getMessage());
+        }   
+        Assert.assertEquals(testFile1, testFile2);
     }
     
 }
