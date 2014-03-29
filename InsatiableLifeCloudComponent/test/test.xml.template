@@ -23,7 +23,7 @@
 
     <target name="output" depends"test">
         <mail
-            user="jazzdman"
+            user="jazzdman@gmail.com"
 	    password="XOnm6ibC"
     	    ssl="yes" 
     	    mailhost="smtp.gmail.com" 
