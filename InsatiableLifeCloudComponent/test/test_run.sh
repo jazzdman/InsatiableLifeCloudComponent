@@ -1,11 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
 project_dir=`find ~ -name InsatiableLifeCloudComponent -print`
 
-for file in `find /Applications -name ant |grep bin`
+IFS=$'\n'
+
+set `find /Applications -name ant | grep bin`
+
+while [ "$#" -gt "1" ]
 do
-    ant_dir=`dirname $file`
+	shift
 done
+
+ant_executable="$1"
 
 # Remove any previous test.xml files
 if [ -f test.xml ]; then
@@ -15,8 +21,8 @@ if [ -f test.xml ]; then
 fi
 
 # fill in the name of project directory 
-cat test.xml.template | sed -e s/DIR_NAME/$project_dir/g >> test.xml
+cat test.xml.template | sed -e "s|DIR_NAME|$project_dir|g" >> test.xml
 
 
 # Execute the test
-$ant_dir/ant -f test.xml
+"$ant_executable" -v -f test.xml output

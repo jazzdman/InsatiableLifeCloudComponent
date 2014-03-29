@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <tstamp> 
-        <format property="test_output.date" pattern="MM-dd-yyyy">
+        <format property="test_output.date" pattern="MM-dd-yyyy" />
     </tstamp>
 
     <target name="update">
         <exec executable="/usr/bin/svn">
-            <arg value="update">
-            <arg value="DIR_NAME">
+            <arg value="update" />
+            <arg value="DIR_NAME" />
         </exec>
     </target>
 
@@ -25,7 +25,7 @@
         </junit>
     </target>
 
-    <target name="output" depends"test">
+    <target name="output" depends="test">
         <mail
             user="jazzdman@gmail.com"
 	    password="XOnm6ibC"
@@ -34,7 +34,7 @@
 	    mailport="465" 
 	    subject="Nightly test results for ${test_output.date}">
                 <to address="jazzdman@gmail.com" />
-                <message src="DIR_NAME/test/test_result.${test_output.date}">
+                <message src="DIR_NAME/test/test_result.${test_output.date}" />
         </mail>
     </target>
     
