@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="output">
-    <taskdef resource="./libs/MyAntTasks.properties" 
-	     classpath="./libs/mytasks.jar" />
+    <taskdef resource="MyAntTasks.properties" 
+	     classpath="DIR_NAME/test/libs/mytasks.jar" />
 
     <target name="password">
 	<encrypt property="gmail.password" />
@@ -14,7 +14,7 @@
     <target name="compile" >
 	<javac srcdir="DIR_NAME/test" 
 	       destdir="DIR_NAME/test" 
-               classpath="./libs/*.jar">
+               classpath="./libs/*.jar:../src/java">
              <exclude name="*.txt" />
              <exclude name="libs/*.jar" />
              <exclude name="test.xml" />
