@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project basedir="." default="output">
+    <taskdef resource="./libs/MyAntTasks.properties" 
+	     classpath="./libs/mytasks.jar" />
+
+    <target name="password">
+	<encrypt property="gmail.password" />
+    </target>
+
     <tstamp> 
         <format property="test_output.date" pattern="MM-dd-yyyy" />
     </tstamp>
@@ -7,10 +14,9 @@
     <target name="compile" >
 	<javac srcdir="DIR_NAME/test" 
 	       destdir="DIR_NAME/test" 
-               classpath="CLASSPATH">
+               classpath="./libs/*.jar">
              <exclude name="*.txt" />
-             <exclude name="activation.jar" />
-             <exclude name="mail.jar" />
+             <exclude name="libs/*.jar" />
              <exclude name="test.xml" />
              <exclude name="test.xml.template" />
              <exclude name="test_run.sh" />
@@ -22,7 +28,8 @@
     <target name="test" depends="compile">
     	<junit printsummary="yes">
             <classpath>
-		<pathelement path="JUNITPATH" />
+		<pathelement path="./libs/ant-junit.jar" />
+		<pathelement path="./libs/junit-4.10.jar" />
 	    </classpath>	
   	    <formatter type="plain" />
             <test 
@@ -32,10 +39,10 @@
         </junit>
     </target>
 
-    <target name="output" depends="test">
+    <target name="output" depends="password, test">
         <mail
             user="jazzdman@gmail.com"
-	    password="XOnm6ibC"
+	    password="${gmail.password}"
     	    ssl="yes" 
     	    mailhost="smtp.gmail.com" 
 	    mailport="465" 
@@ -45,6 +52,4 @@
                 <message src="DIR_NAME/test/test_result.${test_output.date}.txt" />
         </mail>
     </target>
-    
-
 </project>

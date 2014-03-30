@@ -19,44 +19,6 @@ done
 ant_executable="$1"
 shift
 
-# Find the ant junit libraries
-set `find /Applications -name "ant*junit*jar" -print`
-
-while [ "$#" -gt "1" ]
-do
-	shift
-done
-
-junit_path_1="$1"
-shift
-
-
-set `find /Applications -name "junit*jar" -print`
-
-while [ "$#" -gt "1" ]
-do
-	shift
-done
-
-junit_path_2="$1"
-shift
-
-# Find servlet-api.jar
-set `find /Applications -name "servlet-api.jar" -print`
-
-while [ "$#" -gt "1" ]
-do
-	shift
-done
-
-servlet_path="$1"
-shift
-
-
-classpath="$servlet_path:$junit_path_1:$junit_path_2:$project_dir/src/java"
-
-echo "$classpath"
-
 
 # Remove any previous test.xml files
 if [ -f test.xml ]; then
@@ -69,8 +31,8 @@ fi
 rm -rf web_utils/*.class
 
 # fill in the name of project directory 
-cat test.xml.template | sed -e "s|JUNITPATH|$junit_path_2|g"| sed -e "s|DIR_NAME|$project_dir|g" | sed -e "s|CLASSPATH|$classpath|g" >> test.xml
+cat test.xml.template | sed -e "s|DIR_NAME|$project_dir|g"  >> test.xml
 
 
 # Execute the test
-"$ant_executable" -lib . -v -f test.xml output
+"$ant_executable" -lib ./libs -v -f test.xml output
