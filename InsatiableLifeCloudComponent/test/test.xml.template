@@ -28,7 +28,9 @@
     <target name="test" depends="compile">
     	<junit printsummary="yes">
             <classpath>
+		<pathelement path="../src/java" />
 		<pathelement path="./libs/ant-junit.jar" />
+		<pathelement path="." />
 		<pathelement path="./libs/junit-4.10.jar" />
 	    </classpath>	
   	    <formatter type="plain" />

@@ -47,9 +47,9 @@ public class RecipeManagerTest {
         try 
         {
             db = dbf.newDocumentBuilder();
-            testFile1 = new File(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
-            recipeDoc = db.parse(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
-            testFile1.renameTo(new File(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist-test.xml"));
+            testFile1 = new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
+            recipeDoc = db.parse(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
+            testFile1.renameTo(new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist-test.xml"));
             
             rootElement = recipeDoc.getDocumentElement();
             rcpList = rootElement.getElementsByTagName("recipe");
@@ -90,7 +90,7 @@ public class RecipeManagerTest {
         try
         {
             
-            instance = new RecipeManager(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/");
+            instance = new RecipeManager(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/");
             th = new Thread(instance);
             
             th.setDaemon(true);
@@ -116,7 +116,7 @@ public class RecipeManagerTest {
         RecipeManager instance = null;
         try
         {
-            instance = new RecipeManager(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/");
+            instance = new RecipeManager(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/");
         } catch (Exception e)
         {
             fail("Failed to set up testFillRecipeList: "+ e.getMessage());
@@ -131,12 +131,12 @@ public class RecipeManagerTest {
     public void testSerializeRecipeList() {
         System.out.println("serializeRecipeList");
         RecipeManager instance = null;
-        testFile2 = new File(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
+        testFile2 = new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
         
         try
         {
-            instance = new RecipeManager(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/");
-            instance.serializeRecipeList(System.getProperty("user.home")+"sandbox/InsatiableLifeCloudComponent/build/web/");
+            instance = new RecipeManager(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/");
+            instance.serializeRecipeList(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/");
             
         } catch (Exception e)
         {
