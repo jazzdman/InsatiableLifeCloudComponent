@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="output">
-    <taskdef resource="MyAntTasks.properties" 
-	     classpath="DIR_NAME/test/libs/mytasks.jar" />
-
-    <target name="password">
-	<encrypt property="gmail.password" />
-    </target>
 
     <tstamp> 
         <format property="test_output.date" pattern="MM-dd-yyyy" />
@@ -20,9 +14,25 @@
              <exclude name="test.xml" />
              <exclude name="test.xml.template" />
              <exclude name="test_run.sh" />
-             <exclude name="web_utils/testSuiteRun.xml" />
-	     <exclude name="web_utils/BingProxyTestExpectedResults.xml" />
         </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+	<exec executable="jar">
+	    <arg value="cf" />
+            <arg value="libs/mytasks.jar" />
+            <arg value="MyAntTasks.properties" />
+            <arg value="web_utils/EncryptionTask.class" />
+	</exec>
+    </target>
+   
+    <target name="task" depends="jar">
+        <taskdef resource="MyAntTasks.properties" 
+	     classpath="DIR_NAME/test/libs/mytasks.jar" />
+    </target>
+
+    <target name="password" depends="task">
+	<encrypt property="gmail.password" />
     </target>
 
     <target name="test" depends="compile">
