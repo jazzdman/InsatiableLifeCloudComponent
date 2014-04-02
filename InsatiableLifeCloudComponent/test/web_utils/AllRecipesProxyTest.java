@@ -51,21 +51,6 @@ public class AllRecipesProxyTest {
     {
     }
 
-    /*
-    //
-    // Test of generateRecipes method, of class AllRecipesProxy.
-    //
-    @Test
-    public void testGenerateRecipes() {
-        System.out.println("generateRecipes");
-        ArrayList<HashMap<String, String>> recipeHashes = new ArrayList<>();
-        int servings = 2;
-        AllRecipesProxy instance = new AllRecipesProxy();
-        instance.generateRecipes(recipeHashes, servings);
-        
-    }
-    */
-
     //
     // Test of loadRecipeWithReferer method, of class AllRecipesProxy.
     //
