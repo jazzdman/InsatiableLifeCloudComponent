@@ -45,10 +45,10 @@ import common.BusyFlag;
 public class RecipeManager implements Runnable
 {
     
-    private Random rnd;
+    private final Random rnd;
     
     // A temporary path to open files on the server
-    private StringBuffer filePath;
+    private final StringBuffer filePath;
     
     // The lists of dishes and ingredients used by 
     // the RecipeRequestConstructor
@@ -126,6 +126,10 @@ public class RecipeManager implements Runnable
             
     }
     
+    public HashMap<String, HashMap<String,String>> getRecipeList()
+    {
+        return recipeList;
+    }
     
     // This is where the main action of the class happens.
     @Override
@@ -317,7 +321,7 @@ public class RecipeManager implements Runnable
         try 
         {
             db = dbf.newDocumentBuilder();
-            recipeDoc = db.parse(directoryPath+"/conf/recipelist.xml");
+            recipeDoc = db.parse(directoryPath+"WEB-INF/conf/recipelist.xml");
             rootElement = recipeDoc.getDocumentElement();
             rcpList = rootElement.getElementsByTagName("recipe");
             
@@ -348,8 +352,8 @@ public class RecipeManager implements Runnable
     {
         BufferedWriter bw;
         HashMap<String,String> recipe;
-        File oldRecipeFile = new File(directoryPath+"/conf/recipelist.xml");
-        File newRecipeFile = new File(directoryPath+"/conf/recipelist.xml");
+        File oldRecipeFile = new File(directoryPath+"WEB-INF/conf/recipelist.xml");
+        File newRecipeFile = new File(directoryPath+"WEB-INF/conf/recipelist.xml");
         
         // Delete any file that already exists.  We want to overwrite the 
         // contents.
