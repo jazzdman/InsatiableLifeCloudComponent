@@ -1,5 +1,6 @@
 package servlets;
 
+import common.ClientIDManager;
 import web_utils.RecipeManager;
 import web_utils.AllRecipesProxy;
 
@@ -205,6 +206,7 @@ public class ILMenuServlet extends HttpServlet
     // values are acceptable
     public boolean validateRequest(HttpServletRequest request)
     {
+        ClientIDManager cm = ClientIDManager.getInstance();
 	String start = request.getQueryString();
 	StringTokenizer params = new StringTokenizer(start, "&");
 	StringTokenizer keysValues;
@@ -226,6 +228,7 @@ public class ILMenuServlet extends HttpServlet
         valid &= keys[0].equals("maxCal");
         valid &= keys[1].equals("maxPrepTime");
         valid &= keys[2].equals("servings");
+        valid &= keys[3].equals("clientID");
 	
 	// Convert the calorie, prepTime and servings 
 	// strings to integers.
@@ -237,6 +240,10 @@ public class ILMenuServlet extends HttpServlet
         valid &= (calories >= minCalories);
         valid &= (prepTime <=  maxPrepTime);
         valid &= (servings >= minServings);
+        
+        
+        // Make sure the clientID is valid
+        valid &= cm.validateClientID(values[3]);
 
 
 	return valid;

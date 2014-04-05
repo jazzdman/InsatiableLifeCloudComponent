@@ -20,6 +20,10 @@
         <servlet-name>menu</servlet-name>
         <servlet-class>servlets.ILMenuServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>clientID</servlet-name>
+        <servlet-class>servlets.ILClientIDServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>menu</servlet-name>
         <url-pattern>/menu/*</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>settings</servlet-name>
         <url-pattern>/settings/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>clientID</servlet-name>
+        <url-pattern>/clientID</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
