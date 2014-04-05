@@ -5,10 +5,17 @@
         <format property="test_output.date" pattern="MM-dd-yyyy" />
     </tstamp>
 
-    <target name="compile" >
+    <target name="compile_src" >
+	<javac srcdir="DIR_NAME/src/java" 
+	       destdir="DIR_NAME/src/java" 
+               classpath="DIR_NAME/src/libs/*.jar:DIR_NAME/src/java">
+        </javac>
+    </target>
+
+    <target name="compile_test" depends="compile_src" >
 	<javac srcdir="DIR_NAME/test" 
 	       destdir="DIR_NAME/test" 
-               classpath="./libs/*.jar:../src/java">
+               classpath="DIR_NAME/test/libs/*.jar:DIR_NAME/src/java">
              <exclude name="*.txt" />
              <exclude name="libs/*.jar" />
              <exclude name="test.xml" />
@@ -17,7 +24,7 @@
         </javac>
     </target>
 
-    <target name="jar" depends="compile">
+    <target name="jar" depends="compile_test">
 	<exec executable="jar">
 	    <arg value="cf" />
             <arg value="libs/mytasks.jar" />
@@ -35,7 +42,7 @@
 	<encrypt property="gmail.password" />
     </target>
 
-    <target name="test" depends="compile">
+    <target name="test" depends="compile_test">
     	<junit printsummary="yes">
             <classpath>
 		<pathelement path="../src/java" />
