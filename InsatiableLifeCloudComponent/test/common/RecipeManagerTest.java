@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package web_utils;
+package common;
 
 import java.io.File;
 import java.util.HashMap;
