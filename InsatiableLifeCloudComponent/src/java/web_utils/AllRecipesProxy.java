@@ -260,10 +260,8 @@ public class AllRecipesProxy
     }
     
     // This method finds a recipe.  It calls a helper method
-    // to actually load a recipe.  This method then looks to see if
-    // that recipe is valid (i.e. the title is not empty and not a repeat).
-    // If the recipe is valid, the recipe is added to recipeList.  For this
-    // method a recipe is represented as a HashMap. 
+    // to actually load a recipe.  For this method a recipe is 
+    // represented as a HashMap. 
     public HashMap<String, String> generateRecipe(String url, 
                                                   String current_request_url)
                                                   throws MalformedURLException, 
