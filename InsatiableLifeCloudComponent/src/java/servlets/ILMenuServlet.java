@@ -1,7 +1,7 @@
 package servlets;
 
 import common.ClientIDManager;
-import web_utils.RecipeManager;
+import common.RecipeManager;
 import web_utils.AllRecipesProxy;
 
 import java.io.IOException;
