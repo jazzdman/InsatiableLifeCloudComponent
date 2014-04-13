@@ -18,14 +18,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import common.BusyFlag;
 
 /**
  *
+ * The purpose of this class is to assign an ID to each client that communicates
+ * with the server.  This adds a level of security to the application.  The 
+ * will check and discard any IDs that haven't been seen in a year.  This class
+ * is a Singleton, since there is only one list of client IDs. 
  * @author jazzdman
  */
 public class ClientIDManager {
     
+    // 
     public static final String START_ID = "0000001396731101020";
     public static final int CLIENT_ID_LENGTH = 19;
     
@@ -102,10 +106,12 @@ public class ClientIDManager {
         }
     }
     
+    // The method that returns the static reference to this class
     public static ClientIDManager getInstance() {
         return ClientIDManagerHolder.INSTANCE;
     }
     
+    // The inner class that makes this a Singleton.
     private static class ClientIDManagerHolder 
     {
 
@@ -129,13 +135,13 @@ public class ClientIDManager {
             clientID.insert(0, "0");
         }
             
-        clientList.put(clientID.toString(), new Object());  
+        clientList.put(clientID.toString(), new Integer(1));  
         
         bf.freeBusyFlag();
         
-        return clientID.toString();
+        return Long.toString(time);
     }
-    
+   
     public boolean validateClientID(String clientID)
     {
         boolean isValid = true;
