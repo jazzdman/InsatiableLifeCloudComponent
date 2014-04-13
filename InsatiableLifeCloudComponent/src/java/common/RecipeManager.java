@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package web_utils;
+package common;
 
 import java.io.IOException;
 import java.io.BufferedWriter;
@@ -24,7 +24,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import common.BusyFlag;
+import web_utils.RecipeRequestConstructor;
+import web_utils.AllRecipesProxy;
+import web_utils.BingProxy;
+
 
 /**
  * The Insatiable Life app is evolving.  It was originally up to the 
