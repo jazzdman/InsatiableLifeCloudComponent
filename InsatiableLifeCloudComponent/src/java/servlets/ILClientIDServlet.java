@@ -14,11 +14,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import common.ClientIDManager;
+import javax.servlet.annotation.WebServlet;
 
 /**
  *
  * @author jazzdman
  */
+@WebServlet(value="/clientID")
 public class ILClientIDServlet extends HttpServlet {
 
     /**
