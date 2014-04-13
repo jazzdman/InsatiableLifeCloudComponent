@@ -10,7 +10,7 @@ import java.io.IOException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
-import web_utils.RecipeManager;
+import common.RecipeManager;
 /**
  *
  * @author jazzdman
@@ -27,9 +27,13 @@ public class MenuListener implements ServletContextListener
     {
         ServletContext servletContext = sce.getServletContext();
         RecipeManager rm = (RecipeManager)servletContext.getAttribute("rm");
-        rm.end();
-        rm.serializeRecipeList(servletContext.getRealPath("/"));
         
+        if(rm != null)
+        {
+            rm.end();
+            rm.serializeRecipeList(servletContext.getRealPath("/"));
+        }
+            
         servletContext.removeAttribute("rm");
        
             
@@ -56,7 +60,10 @@ public class MenuListener implements ServletContextListener
         {
             rm = null;
         }
-        servletContext.setAttribute("rm", rm);
-       
+        
+        if (rm != null)
+        {
+            servletContext.setAttribute("rm", rm);
+        }
     }
 }
