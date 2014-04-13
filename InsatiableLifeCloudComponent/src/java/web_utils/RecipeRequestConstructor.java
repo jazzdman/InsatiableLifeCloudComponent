@@ -7,7 +7,7 @@ import java.util.Random;
  *
  * This class is responsible for creating a search URL for Bing.
  *
- ************************************************************/
+ */
 public class RecipeRequestConstructor
 {
     // A string that will hold the results created by this class

@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
  * to find the links.  It assumes that ten pages of results will
  * be returned and chooses a random page from those ten.
  *
- *****************************************************************/
+ */
 public class BingProxy
 {
 

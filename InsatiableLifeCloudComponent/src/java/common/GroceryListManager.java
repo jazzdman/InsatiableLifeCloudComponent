@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package common;
 
 import java.io.BufferedWriter;
@@ -19,7 +13,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
+ * This class is used to control access to the grocery lists of all clients.  
+ * 
+ * It contains methods to save a grocery list from a client and to return a 
+ * grocery list for a particular client.
+ * 
+ * This class also contains methods for serializing and de-serializing the 
+ * grocery lists.
+ * 
+ * This class is a Singleton, since there is only one list of grocery lists. 
+ * 
  * @author jazzdman
  */
 public class GroceryListManager 

@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package common;
 
 import java.io.BufferedWriter;
@@ -23,8 +17,8 @@ import org.w3c.dom.NodeList;
  *
  * The purpose of this class is to assign an ID to each client that communicates
  * with the server.  This adds a level of security to the application.  The 
- * will check and discard any IDs that haven't been seen in a year.  This class
- * is a Singleton, since there is only one list of client IDs. 
+ * class will check and discard any IDs that haven't been seen in a year.  
+ * This class is a Singleton, since there is only one list of client IDs. 
  * @author jazzdman
  */
 public class ClientIDManager {

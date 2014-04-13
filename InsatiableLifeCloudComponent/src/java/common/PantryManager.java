@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package common;
 
 import java.io.BufferedWriter;
@@ -17,7 +11,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
+ * This class is used to control access to the pantries of all clients.
+ * 
+ * It contains one unique method to update the contents of pantry for a 
+ * particular client.
+ * 
+ * This class also contains methods for serializing and de-serializing the 
+ * pantries.
+ * 
+ * This class is a Singleton, since there is only one list of pantry contents. 
+ * 
  * @author jazzdman
  */
 public class PantryManager {
