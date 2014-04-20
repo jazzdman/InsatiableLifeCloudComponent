@@ -96,12 +96,16 @@ public class ILClientIDServlet extends HttpServlet {
     
     public void associate(PrintWriter pw)
     {
-        ClientIDManager.getInstance().getClientID(originalID).setAssociation(associateID);
-        
         try {
-            /* TODO output your page here. You may use following sample code. */
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<associate>success</associate>");            
+            if(ClientIDManager.getInstance().validateClientID(originalID))
+            {
+                ClientIDManager.getInstance().getClientID(originalID).setAssociation(associateID);
+                pw.println("<associate>success</associate>");
+            } else {
+                pw.println("<associate>failure</associate>");
+            }
+                           
         } catch (Exception e)
         {
             
@@ -110,7 +114,8 @@ public class ILClientIDServlet extends HttpServlet {
     
     public void create(PrintWriter pw)
     {
-        try {
+        try 
+        {
             /* TODO output your page here. You may use following sample code. */
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             pw.println("<clientID>");
