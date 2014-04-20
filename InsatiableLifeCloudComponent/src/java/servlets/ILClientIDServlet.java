@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import common.ClientIDManager;
+import java.util.StringTokenizer;
 import javax.servlet.annotation.WebServlet;
 
 /**
@@ -19,6 +20,16 @@ import javax.servlet.annotation.WebServlet;
 @WebServlet(value="/clientID")
 public class ILClientIDServlet extends HttpServlet {
 
+    private static final int CREATE = 1;
+    
+    private static final int ASSOCIATE = 2;
+    
+    private String operation;
+    
+    private String associateID;
+    
+    private String originalID;
+    
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -29,15 +40,73 @@ public class ILClientIDServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        ClientIDManager cm = ClientIDManager.getInstance();
-        response.setContentType("text/xml;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+            throws ServletException, IOException 
+    {
+        
+        parseRequest(request);
+        
+        if(operation.matches("create"))
+        {
+            response.setContentType("text/xml;charset=UTF-8");
+            create(response.getWriter());
+        }
+        if(operation.matches("associate"))
+            associate(response.getWriter());
+        
+    }
+    
+    public void parseRequest(HttpServletRequest request)
+    {
+        String start = request.getQueryString();
+	StringTokenizer params = new StringTokenizer(start, "&");
+	StringTokenizer keysValues;
+	String[] values = new String[3];
+	String[] keys = new String[3];
+        int i = 0;
+
+	// Break apart the query string by '&'
+	while(params.hasMoreTokens())
+	{
+	    // Break apart the key value pairs
+	    keysValues = new StringTokenizer(params.nextToken(), "=");
+	    keys[i] = keysValues.nextToken();
+	    values[i++] = keysValues.nextToken();
+	}
+        
+        operation = values[0];
+        
+        if(operation.matches("associate"))
+        {
+            originalID = values[1];
+            associateID = values[2];
+        }
+    }
+    
+    public void associate(PrintWriter pw)
+    {
+        ClientIDManager.getInstance().getClientID(originalID).setAssociation(associateID);
+        
+        try {
             /* TODO output your page here. You may use following sample code. */
-            out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            out.println("<clientID>");
-            out.println(cm.createClientID());
-            out.println("</clientID>");            
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            pw.println("<associate>success</associate>");            
+        } catch (Exception e)
+        {
+            
+        }
+    }
+    
+    public void create(PrintWriter pw)
+    {
+        try {
+            /* TODO output your page here. You may use following sample code. */
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            pw.println("<clientID>");
+            pw.println(ClientIDManager.getInstance().createClientID());
+            pw.println("</clientID>");            
+        } catch (Exception e)
+        {
+            
         }
     }
 
