@@ -24,11 +24,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 
-/********************************************************************
- *
- * This class is responsible for responding to a web server request.
+/**
+ * This class is returns a list of recipes as XML to anyone who makes a request
+ * with valid query parameters.
  * 
- ********************************************************************/
+ */
 @WebServlet(value="/menu")
 public class ILMenuServlet extends HttpServlet
 {

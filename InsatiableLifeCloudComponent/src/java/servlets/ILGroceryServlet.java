@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package servlets;
 
 import java.io.IOException;
@@ -15,6 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
+ * This class allows a client access to its grocery list.  It also allows a 
+ * client to send the contents of a grocery list to another client.
+ * 
  * @author jazzdman
  */
 public class ILGroceryServlet extends HttpServlet {
