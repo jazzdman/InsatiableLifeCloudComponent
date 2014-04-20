@@ -27,7 +27,7 @@ public class ClientIDManager {
     public static final String START_ID = "0000001396731101020";
     public static final int CLIENT_ID_LENGTH = 19;
     
-    private HashMap<String,Object> clientList = new HashMap<>();
+    private HashMap<String,ClientID> clientList = new HashMap<>();
     private BusyFlag bf;
     
     private ClientIDManager() 
@@ -36,7 +36,6 @@ public class ClientIDManager {
         DocumentBuilder db;
         Document recipeDoc;
         Element rootElement;
-        String urlValue=null;
         NodeList tmpList;
         Node tmpNode;
         
@@ -51,7 +50,8 @@ public class ClientIDManager {
             for(int i = 0; i < tmpList.getLength(); i++)
             {
                 tmpNode = tmpList.item(i);   
-                clientList.put(tmpNode.getNodeValue(), new Object());
+                clientList.put(tmpNode.getChildNodes().item(0).getNodeValue(), 
+                               new ClientID(tmpNode));
             }
         } catch (Exception e)
         {
@@ -65,6 +65,7 @@ public class ClientIDManager {
     // This method likely will only be called when the ILMenuServlet is stopped.
     public void serializeClientList()
     {
+        ClientID tmpID;
         BufferedWriter bw;
         HashMap<String,String> recipe;
         File oldClientFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/clientlist.xml");
@@ -85,12 +86,11 @@ public class ClientIDManager {
         
             for(String keyOne:clientList.keySet())
             {
-                bw.write("\t<clientID>");
-                bw.write(keyOne);    
-                bw.write("</clientID>\r\n");
+                tmpID = clientList.get(keyOne);
+                tmpID.serialize(bw);
             }
         
-            bw.write("</clients>");
+            bw.write("\r\n</clients>");
             
             bw.flush();
             bw.close();
@@ -116,9 +116,29 @@ public class ClientIDManager {
     {
         long time;
         StringBuffer clientID;
-        
+        Document doc = null;
+        Node rootElement, idNode, requestNode, associationsNode;
         bf.getBusyFlag();
         
+        try
+        {    
+            doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        }
+        catch(Exception e)
+        {
+            
+        }
+            
+        rootElement = doc.createElement("clientID");
+        idNode = doc.createElement("ID");
+        requestNode = doc.createElement("request");
+        requestNode.setNodeValue(new Integer(1).toString());
+        associationsNode = doc.createElement("associations");
+        
+        rootElement.appendChild(idNode);
+        rootElement.appendChild(requestNode);
+        rootElement.appendChild(associationsNode);
+       
         time = System.currentTimeMillis();
         clientID = new StringBuffer();
         
@@ -128,8 +148,9 @@ public class ClientIDManager {
         {
             clientID.insert(0, "0");
         }
+        idNode.setNodeValue(clientID.toString());
             
-        clientList.put(clientID.toString(), new Integer(1));  
+        clientList.put(clientID.toString(), new ClientID(rootElement));  
         
         bf.freeBusyFlag();
         
@@ -138,6 +159,7 @@ public class ClientIDManager {
    
     public boolean validateClientID(String clientID)
     {
+        ClientID id;
         boolean isValid = true;
         
         bf.getBusyFlag();
@@ -150,6 +172,10 @@ public class ClientIDManager {
         
         // Make sure the clientID is one we have handed out
         isValid &= clientList.containsKey(clientID);
+        
+        // Update the number of requests
+        id = clientList.get(clientID);
+        id.updateRequests();
         
         bf.freeBusyFlag();
         
