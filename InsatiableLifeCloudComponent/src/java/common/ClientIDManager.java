@@ -180,7 +180,7 @@ public class ClientIDManager {
         
         // Update the number of requests
         id = clientList.get(clientID);
-        id.updateRequests();
+        id.updateRequest();
         
         bf.freeBusyFlag();
         

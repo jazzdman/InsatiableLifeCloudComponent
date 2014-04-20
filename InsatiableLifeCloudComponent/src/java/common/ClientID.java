@@ -9,6 +9,8 @@ package common;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import java.util.ArrayList;
+import java.util.Date;
+import java.text.DateFormat;
 import java.io.IOException;
 import java.io.BufferedWriter;
 
@@ -23,7 +25,7 @@ import java.io.BufferedWriter;
 public class ClientID 
 {
     private String ID;
-    private int requests;
+    private Date latestRequest;
     private ArrayList<String> associations;
     
     public ClientID(Node clientID)
@@ -32,7 +34,14 @@ public class ClientID
         NodeList tmpList;
         
         ID = clientID.getChildNodes().item(0).getNodeValue();
-        requests = Integer.parseInt(clientID.getChildNodes().item(1).getNodeValue());
+        try
+        {
+            latestRequest = DateFormat.getInstance().parse(clientID.getChildNodes().item(1).getNodeValue());
+        }
+        catch(Exception e)
+        {
+            latestRequest = new Date();
+        }
         tmpList = clientID.getChildNodes().item(2).getChildNodes();
         associations = new ArrayList();
         
@@ -52,14 +61,14 @@ public class ClientID
         return associations;
     }
     
-    public void updateRequests()
+    public void updateRequest()
     {
-        requests++;
+        latestRequest = new Date();
     }
     
-    public int getRequests()
+    public Date getLatestRequest()
     {
-        return requests;
+        return latestRequest;
     }
     
     public String getID()
@@ -71,7 +80,7 @@ public class ClientID
     {
         bw.write("<clientID>");
         bw.write("<ID>"+ID+"</ID>");
-        bw.write("<requests>"+new Integer(requests).toString()+"</requests>");
+        bw.write("<request>"+latestRequest.toString() +"</request>");
         bw.write("<associations>");
         for(String s:associations)
         {
