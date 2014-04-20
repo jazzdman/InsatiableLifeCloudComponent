@@ -100,6 +100,11 @@ public class ClientIDManager {
         }
     }
     
+    public ClientID getClientID(String ID)
+    {
+        return clientList.get(ID);
+    }
+    
     // The method that returns the static reference to this class
     public static ClientIDManager getInstance() {
         return ClientIDManagerHolder.INSTANCE;
