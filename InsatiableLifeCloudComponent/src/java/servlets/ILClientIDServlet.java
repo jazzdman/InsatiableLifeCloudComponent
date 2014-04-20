@@ -13,7 +13,8 @@ import javax.servlet.annotation.WebServlet;
 
 /**
  *
- * This class returns a client ID to anyone who makes a request.
+ * This class returns a client ID to anyone who makes a request.  Also allows
+ * a client to associate one client ID to another.
  * 
  * @author jazzdman
  */
@@ -24,7 +25,7 @@ public class ILClientIDServlet extends HttpServlet {
     
     private static final int ASSOCIATE = 2;
     
-    private String operation;
+    private int operation;
     
     private String associateID;
     
@@ -45,14 +46,25 @@ public class ILClientIDServlet extends HttpServlet {
         
         parseRequest(request);
         
-        if(operation.matches("create"))
+        switch(operation)
         {
-            response.setContentType("text/xml;charset=UTF-8");
-            create(response.getWriter());
+            case CREATE:
+                response.setContentType("text/xml;charset=UTF-8");
+                create(response.getWriter());
+                break;
+            case ASSOCIATE:
+                response.setContentType("text/xml;charset=UTF-8");
+                associate(response.getWriter());
+                break;
+            default:
+                try (PrintWriter writer = response.getWriter()) 
+                {    
+                    response.setContentType("text/xml;charset=UTF-8");
+                    writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                    writer.println("</error>");
+                }
+                break;
         }
-        if(operation.matches("associate"))
-            associate(response.getWriter());
-        
     }
     
     public void parseRequest(HttpServletRequest request)
@@ -73,9 +85,9 @@ public class ILClientIDServlet extends HttpServlet {
 	    values[i++] = keysValues.nextToken();
 	}
         
-        operation = values[0];
+        operation = Integer.parseInt(values[0]);
         
-        if(operation.matches("associate"))
+        if(operation == ASSOCIATE)
         {
             originalID = values[1];
             associateID = values[2];
