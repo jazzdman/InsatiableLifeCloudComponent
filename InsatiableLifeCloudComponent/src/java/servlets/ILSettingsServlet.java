@@ -1,7 +1,9 @@
 package servlets;
 
+import common.ClientIDManager;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -37,6 +39,9 @@ public class ILSettingsServlet extends HttpServlet
     
     // Indicate an error in the init method
     private static final int SERVER_INIT_ERROR = -1;
+    
+    // Indicate that we couldn't validate the user
+    private static final int VALIDATION_ERROR = -2;
 
     // This method gets called the first time a request is made to the 
     // servlet.  It is effectively the constructor for this class.  I use it
@@ -88,30 +93,68 @@ public class ILSettingsServlet extends HttpServlet
 							   IOException,
                                                            NumberFormatException
     {
+        StringBuffer respBuf = new StringBuffer();
+        
+        respBuf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+         
+        if(!validateRequest(request))
+        {
+            respBuf.append("</params>");
+            respBuf.append("<param>"+ new Integer(VALIDATION_ERROR).toString() +"</param>");
+            respBuf.append("</params>");
+                
+        } else if(servletProblem)
+        {
+            respBuf.append("</params>");
+            respBuf.append("<param>"+ new Integer(SERVER_INIT_ERROR).toString() +"</param>");
+            respBuf.append("</params>");
+                
+        } else {
+            
+            respBuf.append("<params>");
+            respBuf.append("<preptime>"+ prepTime +"</preptime>");
+            respBuf.append("<servings>"+ servings +"</servings>");
+            respBuf.append("<calories>"+ calories +"</calories>");
+            respBuf.append("</params>");
+        }
+            
 	response.setContentType("text/xml");
         try (PrintWriter writer = response.getWriter()) 
         {
-            writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            
-            if(servletProblem)
-            {
-                writer.print("</params>");
-                writer.print("<param>"+ new Integer(SERVER_INIT_ERROR).toString() +"</param>");
-                writer.print("</params>");
-                return;
-            }
-            
-            
-            writer.print("<params>");
-            
-            writer.print("<preptime>"+ prepTime +"</preptime>");
-            
-            writer.print("<servings>"+ servings +"</servings>");
-            
-            writer.print("<calories>"+ calories +"</calories>");
-            
-            writer.print("</params>");
+            writer.print(respBuf.toString());
         }
+    }
+    
+    // This method breaks apart the query string ?X=A&Y=B&Z=C 
+    // into sets of key value pairs and then breaks out the value
+    // from those pairs. It also checks to see that the keys and
+    // values are acceptable
+    public boolean validateRequest(HttpServletRequest request)
+    {
+        ClientIDManager cm = ClientIDManager.getInstance();
+	String start = request.getQueryString();
+	StringTokenizer params = new StringTokenizer(start, "&");
+	StringTokenizer keysValues;
+	String[] values = new String[1];
+	String[] keys = new String[1];
+	int i = 0;
+	boolean valid=true;
+
+	// Break apart the query string by '&'
+	while(params.hasMoreTokens())
+	{
+	    // Break apart the key value pairs
+	    keysValues = new StringTokenizer(params.nextToken(), "=");
+	    keys[i] = keysValues.nextToken();
+	    values[i++] = keysValues.nextToken();
+	}
+        
+        // Make sure the clientID is valid
+        valid &= keys[0].matches("clientID");
+        valid &= cm.validateClientID(values[0]);
+
+	return valid;
+
     }
 
    
