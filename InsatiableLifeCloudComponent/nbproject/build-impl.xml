@@ -866,6 +866,9 @@ exists or setup the property manually. For example like this:
         <copy todir="${build.web.dir}/META-INF">
             <fileset file="src/conf/context.xml" />
         </copy>
+	<copy todir="${build.web.dir}/WEB-INF/conf">
+            <fileset file="src/conf/ingredients.txt" />
+        </copy>
         <copy todir="${build.web.dir}/WEB-INF/conf">
             <fileset file="src/conf/dishes.txt" />
         </copy>
