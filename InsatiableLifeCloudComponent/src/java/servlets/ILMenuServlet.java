@@ -122,26 +122,16 @@ public class ILMenuServlet extends HttpServlet
             stillOK = false;
         }
             
-        try
+      
+        // Check to make sure the request parameters are named correctly
+        // and have acceptable values.
+        if (stillOK && !validateRequest(request))
         {
-            // Check to make sure the request parameters are named correctly
-            // and have acceptable values.
-            if (stillOK && !validateRequest(request))
-            {
-                responseString.append("<count>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</count>");
-                responseString.append("</recipes>");
-                stillOK = false;
-            }
+            responseString.append("<count>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</count>");
+            responseString.append("</recipes>");
+            stillOK = false;
         }
-        // If we hit a problem, don't do anything. We want to return
-        // whatever we did find.
-        catch(Exception e)
-        {
-           responseString.append("<count>"+ new Integer(SERVER_COLLECT_ERROR).toString()+"</count>");
-           responseString.append("</recipes>");
-           stillOK = false;
-        }
-        
+       
         if(stillOK)
         {
             recipeList = recipeManager.getRecipes(calories, prepTime);
@@ -210,8 +200,8 @@ public class ILMenuServlet extends HttpServlet
 	String start = request.getQueryString();
 	StringTokenizer params = new StringTokenizer(start, "&");
 	StringTokenizer keysValues;
-	String[] values = new String[3];
-	String[] keys = new String[3];
+	String[] values = new String[4];
+	String[] keys = new String[4];
 	int i = 0;
 	boolean valid=true;
 
