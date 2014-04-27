@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
 public class ClientIDManager {
     
     // 
-    public static final String START_ID = "0000001396731101020";
+    public static final String START_ID = "1396731101020";
     public static final int CLIENT_ID_LENGTH = 19;
     
     private HashMap<String,ClientID> clientList = new HashMap<>();
@@ -164,23 +164,30 @@ public class ClientIDManager {
    
     public boolean validateClientID(String clientID)
     {
-        ClientID id;
+        StringBuffer idBuf = new StringBuffer();
         boolean isValid = true;
         
         bf.getBusyFlag();
+        
+        // Apparently Long.decode can't handle the leading zeroes.  So, we 
+        // need to remove them.
+        idBuf.append(clientID);
+        while(idBuf.charAt(0) == '0')
+        {
+            idBuf.deleteCharAt(0);
+        }
         
         // Make sure the clientID string is the right length
         isValid &= (clientID.length() == CLIENT_ID_LENGTH);
         
         // Make sure the clientID is in the right range
-        isValid &= (Long.decode(clientID) > Long.decode(START_ID));
+        isValid &= (Long.decode(idBuf.toString()) > Long.decode(START_ID));
         
         // Make sure the clientID is one we have handed out
         isValid &= clientList.containsKey(clientID);
         
         // Update the number of requests
-        id = clientList.get(clientID);
-        id.updateRequest();
+        clientList.get(clientID).updateRequest();
         
         bf.freeBusyFlag();
         
