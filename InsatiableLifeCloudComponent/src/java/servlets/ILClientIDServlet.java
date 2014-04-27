@@ -25,6 +25,8 @@ public class ILClientIDServlet extends HttpServlet {
     
     private static final int ASSOCIATE = 2;
     
+    private static final int ERROR = -1;
+    
     private int operation;
     
     private String associateID;
@@ -70,12 +72,14 @@ public class ILClientIDServlet extends HttpServlet {
     public void parseRequest(HttpServletRequest request)
     {
         String start = request.getQueryString();
-	StringTokenizer params = new StringTokenizer(start, "&");
+	StringTokenizer params;
 	StringTokenizer keysValues;
 	String[] values = new String[3];
 	String[] keys = new String[3];
         int i = 0;
-
+        
+        params = new StringTokenizer(start, "&");
+        
 	// Break apart the query string by '&'
 	while(params.hasMoreTokens())
 	{
@@ -85,7 +89,15 @@ public class ILClientIDServlet extends HttpServlet {
 	    values[i++] = keysValues.nextToken();
 	}
         
-        operation = Integer.parseInt(values[0]);
+        if(values[0].equals("create"))
+        {
+            operation = CREATE;
+        } else if (values[0].equals("associate"))
+        {
+            operation = ASSOCIATE;
+        } else {
+            operation = ERROR;
+        }
         
         if(operation == ASSOCIATE)
         {
@@ -102,29 +114,31 @@ public class ILClientIDServlet extends HttpServlet {
             {
                 ClientIDManager.getInstance().getClientID(originalID).setAssociation(associateID);
                 pw.println("<associate>success</associate>");
-            } else {
-                pw.println("<associate>failure</associate>");
-            }
+                return;
+            } 
                            
         } catch (Exception e)
         {
             
         }
+        
+        pw.println("<associate>failure</associate>");
     }
     
     public void create(PrintWriter pw)
     {
+        String clientID = ClientIDManager.getInstance().createClientID();
         try 
         {
             /* TODO output your page here. You may use following sample code. */
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<clientID>");
-            pw.println(ClientIDManager.getInstance().createClientID());
-            pw.println("</clientID>");            
+            pw.println("<clientID>"+clientID+"</clientID>");  
+            return;
         } catch (Exception e)
         {
             
         }
+        pw.println("<clientID>-1</clientID>"); 
     }
 
     /**
