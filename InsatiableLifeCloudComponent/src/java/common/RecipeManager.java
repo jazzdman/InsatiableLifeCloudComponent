@@ -41,71 +41,92 @@ import web_utils.BingProxy;
  */
 public class RecipeManager implements Runnable
 {
-    
+    /**
+     * Used to pick out lists of recipes from the BingProxy.
+     */
     private final Random rnd;
     
-    // A temporary path to open files on the server
+    /**
+     * A temporary path to open files on the server
+     */
     private final StringBuffer filePath;
     
-    // The lists of dishes and ingredients used by 
-    // the RecipeRequestConstructor
+    /**
+     * The lists of dishes and ingredients used by 
+     * the RecipeRequestConstructor
+     */
     private List<String> dishes = null, ingredients = null;
     
-    // The list of recipes that this class maintains to 
+    /**
+     * The list of recipes that this class maintains
+     */
     private final HashMap<String, HashMap<String,String>> recipeList;
       
-    // An object to create a random recipe search for Bing.
+    /**
+     * An object to create a random recipe search for Bing.
+     */
     private final RecipeRequestConstructor recipeRequestConstructor;
         
-    // An object that calls to allrecipes.com with a URL created by the
-    // BingProxy and returns a recipe.
+    /**
+     * An object that calls to allrecipes.com with a URL created by the
+     * BingProxy and returns a recipe.
+     */
     private final AllRecipesProxy allRecipesProxy;
         
-    // An object that sends the results from the RecipeRequestConstructor
-    // to Bing and saves the allrecipes.com URLs
+    /**
+     * An object that sends the results from the RecipeRequestConstructor
+     * to Bing and saves the allrecipes.com URLs.
+     */
     private final BingProxy bingProxy;
     
-    // This starts true and the Thread keeps running until this is false.
+    /**
+     * This starts true and the Thread keeps running until this is false.
+     */
     private boolean running;
     
-    // An object to stop and start Threads that call this object, so we don't
-    // try to simultaneously read and write to the recipeList or run into other
-    // race conditions.
+    /**
+     * An object to stop and start Threads that call this object, so we don't
+     * try to simultaneously read and write to the recipeList or run into other
+     * race conditions.
+     */
     private final BusyFlag bf;
     
-    // The size of the recipeList
+    /** 
+     * The size of the recipeList
+     */
     private static final int MAX_RECIPES = 1000;
     
-    // The maximum number of recipes that we will try to 
-    // pull out of the recipeList when getRecipes is called.
+    /**
+     * The maximum number of recipes that we will try to 
+     * pull out of the recipeList when getRecipes is called.
+     */
     private static final int RECIPE_COUNT = 10;
     
     
-    // The constructor for this class.  
-    // Read in data to pass to the RecipeRequestConstructor.
-    // Start the Thread.
-    // Instantiate :
-    //      1) a BingProxy
-    //      2) a AllRecipesProxy 
-    //      3) A RecipeRequestConstructor
-    //      4) A BusyFlag
-    //      5) The recipeList
-    //
-    public RecipeManager(String directoryPath) throws IOException
+    /**
+     * The constructor for this class.  
+     * Read in data to pass to the RecipeRequestConstructor.
+     * Start the Thread.
+     * Instantiate :
+     *      1) a BingProxy
+     *      2) a AllRecipesProxy 
+     *      3) A RecipeRequestConstructor
+     *      4) A BusyFlag
+     *      5) The recipeList
+     */
+    public RecipeManager() throws IOException
     {
         rnd = new Random(System.currentTimeMillis());
         
         filePath = new StringBuffer();
-        filePath.append(directoryPath);
-        filePath.append("WEB-INF/conf/dishes.txt");
+        filePath.append(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/dishes.txt");
         running = true;
           
 	dishes = Files.readAllLines(Paths.get(filePath.toString()),
 					StandardCharsets.US_ASCII);
         filePath.delete(0, filePath.length());
             
-        filePath.append(directoryPath);
-        filePath.append("WEB-INF/conf/ingredients.txt");
+        filePath.append(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/ingredients.txt");
 	ingredients = Files.readAllLines(Paths.get(filePath.toString()),
 					StandardCharsets.US_ASCII);
        
@@ -119,16 +140,22 @@ public class RecipeManager implements Runnable
         recipeList = new HashMap();
         
         // Fill the recipeList if we have something to 
-        fillRecipeList(directoryPath);
+        fillRecipeList();
             
     }
     
+    /**
+     * Return the {@link HashMap} of recipes that this object has collected.
+     */
     public HashMap<String, HashMap<String,String>> getRecipeList()
     {
         return recipeList;
     }
     
-    // This is where the main action of the class happens.
+    /**
+    * This class implements Runnable so that it doesn't clog up the start of
+    * the web app.  This is where the recipeList is constructed.
+    */
     @Override
     public void run()
     {
@@ -170,7 +197,8 @@ public class RecipeManager implements Runnable
             try 
             {
                 // Get the URL to send to Bing
-                current_request_url = recipeRequestConstructor.getRequest();
+                current_request_url = recipeRequestConstructor.getRequest(rnd.nextDouble(),
+                                                                          rnd.nextDouble());
 	
                 // Get recipe URLs from Bing
                 bingProxy.findRecipes(current_request_url);
@@ -236,8 +264,10 @@ public class RecipeManager implements Runnable
             
     }
     
-    // Call this method to stop the run method.
-    // We need to put this Thread on hold before we can actually stop it.
+    /**
+     * Call this method to stop the run method.
+     * We need to put this Thread on hold before we can actually stop it.
+     */
     public void end()
     {
         bf.getBusyFlag();
@@ -302,8 +332,10 @@ public class RecipeManager implements Runnable
         return recipesToReturn;
     }
     
-    // This method reads in the contents of the recipeList from a file.
-    private void fillRecipeList(String directoryPath)
+    /**
+     * This method reads in the contents of the recipeList from a file.
+     */
+    private void fillRecipeList()
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
@@ -318,7 +350,7 @@ public class RecipeManager implements Runnable
         try 
         {
             db = dbf.newDocumentBuilder();
-            recipeDoc = db.parse(directoryPath+"WEB-INF/conf/recipelist.xml");
+            recipeDoc = db.parse(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/recipelist.xml");
             rootElement = recipeDoc.getDocumentElement();
             rcpList = rootElement.getElementsByTagName("recipe");
             
@@ -343,14 +375,16 @@ public class RecipeManager implements Runnable
         }
     }
     
-    // This method saves the contents of the recipeList.
-    // This method likely will only be called when the ILMenuServlet is stopped.
-    public void serializeRecipeList(String directoryPath)
+    /**
+     * This method saves the contents of the recipeList.
+     * This method likely will only be called when the ILMenuServlet is stopped.
+     */
+    public void serializeRecipeList()
     {
         BufferedWriter bw;
         HashMap<String,String> recipe;
-        File oldRecipeFile = new File(directoryPath+"WEB-INF/conf/recipelist.xml");
-        File newRecipeFile = new File(directoryPath+"WEB-INF/conf/recipelist.xml");
+        File oldRecipeFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/recipelist.xml");
+        File newRecipeFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/recipelist.xml");
         
         // Delete any file that already exists.  We want to overwrite the 
         // contents.
@@ -378,7 +412,6 @@ public class RecipeManager implements Runnable
             }
         
             bw.write("</recipes>");
-            
             bw.flush();
             bw.close();
             

@@ -32,35 +32,58 @@ import org.apache.commons.codec.binary.Base64;
 @WebServlet(value="/menu")
 public class ILMenuServlet extends HttpServlet
 {
-    
+    /**
+     * Used to gather information about the InsatiableLifeCloudComponent app.
+     */
     ServletContext servletContext;
     
-    // A variable to decide if there is a problem setting up the servlet
+    /**
+     * A variable to decide if there is a problem setting up the servlet.
+     */
     private boolean servletProblem;
     
-    // Indicate an error in the init method
+    /**
+     * Indicate an error in the init method
+     */
     private static final int SERVER_INIT_ERROR = -1;
     
-    // Indicate an empty recipe search list
+    /**
+     * Indicate an empty recipe search list
+     */
     private static final int BING_LIST_EMPTY_ERROR = -2;
     
-    // Indicate invalid request parameters
+    /**
+     * Indicate invalid request parameters
+     */
     private static final int INVALID_REQUEST_PARAMETERS_ERROR = -3;
     
-    // Indicate invalid request parameters
+    /**
+     * Indicate invalid request parameters
+     */
     private static final int SERVER_COLLECT_ERROR = -5;
     
+    /**
+     * The number of minutes in an hour
+     */
     private static final int MINUTES_PER_HOUR = 60;
     
-     // The calories, preptime and servings the user has passed along in 
-    // the request.
+    /**
+     * The calories, preptime and servings the user has passed along in 
+     * the request.
+     */
     private int prepTime, calories, servings;
     
+    /**
+     * The limits on prepTime, calories and servings.
+     */
     private int maxPrepTime, minCalories, minServings;
 
-    // This method gets called the first time a request is made to the 
-    // servlet.  It is effectively the constructor for this class.  I use it
-    // to instantiate member variables.
+    /**
+     * This method gets called the first time a request is made to the 
+     * servlet.  It is effectively the constructor for this class.  I use it
+     * to instantiate member variables.
+     * @throws javax.servlet.ServletException
+     */
     @Override
     public void init() throws ServletException
     {  
@@ -84,19 +107,28 @@ public class ILMenuServlet extends HttpServlet
     }
 
     @Override
-    // Return a name for this servlet
+    /**
+     * Return a name for this servlet
+     */
     public String getServletInfo()
     {
 	return "Insatiable Life Menu Servlet";
     }
 
+
+    /**
+     * This method actually services the request that is made to the web
+     * server.  It searches for recipes in the RecipeManager that conform to
+     * prep time and calorie constraints passed in with the request.  The 
+     * AllRecipesProxy is then used to scale the recipes from RecipeManager 
+     * to the desired number of servings.  The scaled recipes that match the 
+     * requirements are passed back in the response as XML.
+     * @param request
+     * @param response
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
+     */
     @Override
-    // This method actually services the request that is made to the web
-    // server.  It searches for recipes in the RecipeManager that conform to
-    // prep time and calorie constraints passed in with the request.  The 
-    // AllRecipesProxy is then used to scale the recipes from RecipeManager 
-    // to the desired number of servings.  The scaled recipes that match the 
-    // requirements are passed back in the response as XML.
     public void doGet(HttpServletRequest request,
 	     	      HttpServletResponse response) throws ServletException,
 							 IOException
@@ -190,10 +222,14 @@ public class ILMenuServlet extends HttpServlet
         arp.getRecipeList().clear();
     }
 
-    // This method breaks apart the query string ?X=A&Y=B&Z=C 
-    // into sets of key value pairs and then breaks out the value
-    // from those pairs. It also checks to see that the keys and
-    // values are acceptable
+    /**
+     * This method breaks apart the query string ?X=A&Y=B&Z=C 
+     * into sets of key value pairs and then breaks out the value
+     * from those pairs. It also checks to see that the keys and
+     * values are acceptable
+     * @param request
+     * @return 
+     */
     public boolean validateRequest(HttpServletRequest request)
     {
         ClientIDManager cm = ClientIDManager.getInstance();
@@ -240,8 +276,13 @@ public class ILMenuServlet extends HttpServlet
 
     }
 
-    // This method is used to GZIP and Base64 encode 
-    // the HTML for a recipe
+    /**
+     * This method is used to GZIP and Base64 encode the HTML for a recipe
+     * @param str
+     * @return 
+     * @throws java.io.IOException
+     * @throws java.io.UnsupportedEncodingException
+     */
     public String compress(String str) throws IOException,
 				              UnsupportedEncodingException  
     {

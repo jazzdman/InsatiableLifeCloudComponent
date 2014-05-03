@@ -20,17 +20,13 @@ import javax.servlet.annotation.WebServlet;
  */
 @WebServlet(value="/clientID")
 public class ILClientIDServlet extends HttpServlet {
-
-    private static final int CREATE = 1;
     
-    private static final int ASSOCIATE = 2;
+    // The operation the client has requested
+    private String operation;
     
-    private static final int ERROR = -1;
-    
-    private int operation;
-    
+    // In the case that the user has requested an association, these are
+    // the strings/ client IDs to associate with one another
     private String associateID;
-    
     private String originalID;
     
     /**
@@ -45,19 +41,24 @@ public class ILClientIDServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException 
     {
-        
+        // Figure out what the user has requested
         parseRequest(request);
         
+        // Respond based upon their request
         switch(operation)
         {
-            case CREATE:
+            // We have been asked to create a client ID
+            case "create":
                 response.setContentType("text/xml;charset=UTF-8");
                 create(response.getWriter());
                 break;
-            case ASSOCIATE:
+            // We have been asked to associate one client ID with another
+            case "associate":
                 response.setContentType("text/xml;charset=UTF-8");
                 associate(response.getWriter());
                 break;
+            // If we weren't able to parse the request, send back an error 
+            // message.
             default:
                 try (PrintWriter writer = response.getWriter()) 
                 {    
@@ -69,6 +70,14 @@ public class ILClientIDServlet extends HttpServlet {
         }
     }
     
+    /**
+     * 
+     * @param request - The HTTPServletRequest that contains the query string
+     *                  we're interested in.
+     * 
+     * Use this method to figure out what the user has requested 
+     * 
+     */
     public void parseRequest(HttpServletRequest request)
     {
         String start = request.getQueryString();
@@ -89,56 +98,85 @@ public class ILClientIDServlet extends HttpServlet {
 	    values[i++] = keysValues.nextToken();
 	}
         
-        if(values[0].equals("create"))
+        // For safety's sake, make sure the request is valid
+        if(!keys[0].matches("operation"))
         {
-            operation = CREATE;
-        } else if (values[0].equals("associate"))
-        {
-            operation = ASSOCIATE;
-        } else {
-            operation = ERROR;
+            operation = "error";
+            return;
         }
         
-        if(operation == ASSOCIATE)
+        // Set the operation
+        operation = keys[0];
+        
+        // If the request is for an association, make sure we have the right
+        // number of values
+        if(operation.matches("associate") &&
+           (values[1] == null || values[2] == null))
+        {
+            operation = "error";
+            return;
+        }
+        
+        // If the user has requested an association, get the IDs to associate
+        // with one another.
+        if(operation.matches("associate"))
         {
             originalID = values[1];
             associateID = values[2];
         }
     }
     
+    /**
+     * 
+     * @param pw - The PrintWriter used to return the response
+     * 
+     * Call the ClientIDManager to associate one clientID with another.
+     * 
+     */
     public void associate(PrintWriter pw)
     {
-        try {
-            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            if(ClientIDManager.getInstance().validateClientID(originalID))
-            {
-                ClientIDManager.getInstance().getClientID(originalID).setAssociation(associateID);
-                pw.println("<associate>success</associate>");
-                return;
-            } 
-                           
-        } catch (Exception e)
-        {
-            
-        }
+       
+        // Print out a valid XML header
+        pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         
-        pw.println("<associate>failure</associate>");
+        // Make sure that both IDs are valid.  If they are, make the association
+        if(ClientIDManager.getInstance().validateClientID(originalID) &&
+           ClientIDManager.getInstance().validateClientID(associateID))
+        {
+            ClientIDManager.getInstance().getClientID(originalID).addAssociation(associateID);
+            pw.println("<associate>success</associate>");      
+        }
+        // If both IDs are not valid, let the client know.
+        else 
+        {
+            pw.println("<associate>failure</associate>");
+        }
+                         
+        
     }
     
+    /**
+     * 
+     * @param pw - The PrintWriter used to return the response
+     * 
+     * Call the ClientIDManager to create and save a client ID.
+     * 
+     */
     public void create(PrintWriter pw)
     {
+        // Ask for a client ID from the ClientIDManager
         String clientID = ClientIDManager.getInstance().createClientID();
-        try 
+        
+        // Make sure the clientID is valid.
+        if(clientID == null)
         {
-            /* TODO output your page here. You may use following sample code. */
-            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<clientID>"+clientID+"</clientID>");  
-            return;
-        } catch (Exception e)
-        {
-            
+            clientID = new Integer(-1).toString();
         }
-        pw.println("<clientID>-1</clientID>"); 
+       
+        // Return the result to the client.
+        pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        pw.println("<clientID>"+clientID+"</clientID>");  
+        
     }
 
     /**

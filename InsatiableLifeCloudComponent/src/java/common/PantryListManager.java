@@ -2,8 +2,6 @@ package common;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,53 +11,46 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This class is used to control access to the grocery lists of all clients.  
+ * This class is used to control access to the pantries of all clients.
  * 
- * It contains methods to save a grocery list from a client and to return a 
- * grocery list for a particular client.
+ * It contains one unique method to update the contents of pantry for a 
+ * particular client.
  * 
  * This class also contains methods for serializing and de-serializing the 
- * grocery lists.
+ * pantries.
  * 
- * This class is a Singleton, since there is only one list of grocery lists. 
+ * This class is a Singleton, since there is only one list of pantry contents. 
  * 
  * @author jazzdman
  */
-public class GroceryListManager 
-{
-
-    /**
-     * The list of recipes that this class maintains for each client
-     */
-    private final HashMap<String, HashMap<String,String>> groceryList;
+public class PantryListManager {
     
     /**
      * The constructor for this class.
      */
-    private GroceryListManager() 
-    {
-        groceryList = new HashMap();
+    private PantryListManager() {
     }
     
     /**
-     * The method that returns the static reference to this class
+     * The method that returns the static reference to this class.
+     * @return 
      */
-    public static GroceryListManager getInstance() {
-        return GroceryListManagerHolder.INSTANCE;
+    public static PantryListManager getInstance() {
+        return PantryListManagerHolder.INSTANCE;
     }
     
     /**
      * The inner class that makes this a Singleton.
      */
-    private static class GroceryListManagerHolder {
+    private static class PantryListManagerHolder {
 
-        private static final GroceryListManager INSTANCE = new GroceryListManager();
+        private static final PantryListManager INSTANCE = new PantryListManager();
     }
     
     /**
      * This method reads in the contents of the recipeList from a file.
      */
-    private void fillGroceryList()
+    private void fillPantryList()
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
@@ -74,7 +65,7 @@ public class GroceryListManager
         try 
         {
             db = dbf.newDocumentBuilder();
-            recipeDoc = db.parse(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/grocerylist.xml");
+            recipeDoc = db.parse(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/pantrylist.xml");
             rootElement = recipeDoc.getDocumentElement();
          
         } catch (Exception e)
@@ -87,14 +78,13 @@ public class GroceryListManager
      * This method saves the contents of the recipeList.
      * This method likely will only be called when the ILMenuServlet is stopped.
      */
-    public void serializeGroceryList()
+    public void serializePantryList()
     {
         BufferedWriter bw;
         HashMap<String,String> recipe;
-        File oldGroceryFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/grocerylist.xml");
-        File newGroceryFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/grocerylist.xml");
+        File oldGroceryFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/pantrylist.xml");
+        File newGroceryFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/pantrylist.xml");
         
       
     }
-    
 }

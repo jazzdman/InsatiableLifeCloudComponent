@@ -28,25 +28,39 @@ import javax.servlet.http.HttpServletResponse;
 public class ILSettingsServlet extends HttpServlet
 {
    
-    // A variable to decide if there is a problem setting up the servlet
+    /**
+     * A variable to decide if there is a problem setting up the servlet
+     */
     private boolean servletProblem;
     
-    // Use these to store calories, preptime and servings, so we only have
-    // do read the init parameters once.
+    /**
+     * Use these to store calories, preptime and servings, so we only have
+     * do read the init parameters once.
+     */
     private String prepTime, calories, servings;
     
+    /**
+     * The number of minutes in an hour
+     */
     private static final int MINUTES_PER_HOUR = 60;
     
-    // Indicate an error in the init method
+    /**
+     * Indicate an error in the init method
+     */
     private static final int SERVER_INIT_ERROR = -1;
     
-    // Indicate that we couldn't validate the user
+    /**
+     * Indicate that we couldn't validate the user
+     */
     private static final int VALIDATION_ERROR = -2;
 
-    // This method gets called the first time a request is made to the 
-    // servlet.  It is effectively the constructor for this class.  I use it
-    // to instantiate member variables.  Those instance variables are the
-    // values that the client setting screen will need.
+    /**
+     * This method gets called the first time a request is made to the 
+     * servlet.  It is effectively the constructor for this class.  I use it
+     * to instantiate member variables.  Those instance variables are the
+     * values that the client setting screen will need.
+     * @throws javax.servlet.ServletException
+     */
     @Override
     public void init() throws ServletException
     {
@@ -78,16 +92,27 @@ public class ILSettingsServlet extends HttpServlet
     }
 
     @Override
-    // Return a name for this servlet
+    /**
+     * Return a name for this servlet
+     */
     public String getServletInfo()
     {
 	return "Insatiable Life Settings Servlet";
     }
 
+    /**
+     *
+     * This method actually services the request that is made to the web
+     * server.  The variables are passed back in the response
+     * as XML.
+     * 
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     * @throws NumberFormatException
+     */
     @Override
-    // This method actually services the request that is made to the web
-    // server.  The variables are passed back in the response
-    // as XML.
     public void doGet(HttpServletRequest request,
 	     	      HttpServletResponse response) throws ServletException,
 							   IOException,
@@ -125,10 +150,14 @@ public class ILSettingsServlet extends HttpServlet
         }
     }
     
-    // This method breaks apart the query string ?X=A&Y=B&Z=C 
-    // into sets of key value pairs and then breaks out the value
-    // from those pairs. It also checks to see that the keys and
-    // values are acceptable
+    /**
+     * This method breaks apart the query string ?X=A&Y=B&Z=C 
+     * into sets of key value pairs and then breaks out the value
+     * from those pairs. It also checks to see that the keys and
+     * values are acceptable.
+     * @param request
+     * @return 
+     */
     public boolean validateRequest(HttpServletRequest request)
     {
         ClientIDManager cm = ClientIDManager.getInstance();

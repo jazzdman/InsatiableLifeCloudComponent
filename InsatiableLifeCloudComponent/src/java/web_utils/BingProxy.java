@@ -23,22 +23,41 @@ import java.util.regex.Matcher;
 public class BingProxy
 {
 
-    // The list of URLs that this class finds
+    /**
+     * The list of URLs that this class finds
+     */
     private final HashMap<String, Object> recipeURLs;
     
+    /**
+     * A temporary collection of recipe URLs used to enable testing.
+     */
     List<String> searchResults;
     
+    /**
+     * The object used to connect to Bing and get back results.
+     */
     HttpURLConnection connection;
     
+    /**
+     * The objects used to apply Regular Expressions to the results collected
+     * with the HttpURLConnection.
+     */
     Pattern ptrn;
     Matcher mtchr;
     
+    /**
+     * The object used to read out the results from the HttpURLConnection.
+     */
     BufferedReader in;
     
+    /**
+     * The object used to hold the results read from the HttpURLConnection.
+     */
     StringBuffer bingPage; 
 
-    // The constructor for this class.
-    // Initialize the list of URLs
+    /**
+     * Initialize the lists of URLs
+     */
     public BingProxy()
     {
 	recipeURLs = new HashMap();
@@ -46,16 +65,19 @@ public class BingProxy
         
     }
 
-    // Return the list of URLs, and its contents, compiled 
-    // by this class
+    /**
+     * Return the list of URLs, and its contents, compiled by this class.
+     */
     public ArrayList<String> getRecipeURLs()
     {
 	return new ArrayList(recipeURLs.keySet());
     }
 
-    // This method is called to actually carry out the search for
-    // allrecipes.com URLs using Bing.  It uses Regular Expressions
-    // to grab a random page of Bing results.
+    /**
+     * This method is called to actually carry out the search for
+     * allrecipes.com URLs using Bing.  It uses Regular Expressions
+     * to grab a random page of Bing results.
+     */
     public void findRecipes(String searchString) 
     {
 	// The RE that finds the various pages from the search results
@@ -121,16 +143,20 @@ public class BingProxy
 	}
     }
     
-    // This a utility method.  By allowing access to the search results we
-    // got from Bing, we are able to unit test this class.
+    /**
+     * This a utility method.  By allowing access to the search results we
+     * got from Bing, we are able to unit test this class.
+     */
     public List<String> getSearchResults()
     {
         return searchResults;
     }
     
-    // This method was split off from the findRecipes method to enable
-    // unit testing of this class.  This method scrapes out the actual 
-    // allrecipes.com URLs from a random Bing page.
+    /** 
+     * This method was split off from the findRecipes method to enable
+     * unit testing of this class.  This method scrapes out the actual 
+     * allrecipes.com URLs from a random Bing page.
+     */
     public void filterRecipes(int rndIndex)
     {
         URL tempURL1;

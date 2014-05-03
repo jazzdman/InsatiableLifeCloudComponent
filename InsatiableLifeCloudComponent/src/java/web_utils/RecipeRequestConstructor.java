@@ -10,17 +10,27 @@ import java.util.Random;
  */
 public class RecipeRequestConstructor
 {
-    // A string that will hold the results created by this class
+    /**
+     * A string that will hold the results created by this class.
+     */
     private StringBuffer request;
-    // A random number generator used to define a random search URL
+    
+    /**
+     * A random number generator used to define a random search URL.
+     */
     private final Random rnd;
-    // A list of dishes and ingredients used to create the URL
+    
+    /**
+     * A list of dishes and ingredients used to create the URL.
+     */
     private final List<String> dishes, ingredients;
 
-    // The constructor for this class
-    // Initialize the list of dishes and ingredients, the random 
-    // number generator, and the string buffer into which the URL
-    // will be added.
+    /**
+     * The constructor for this class
+     * Initialize the list of dishes and ingredients, the random 
+     * number generator, and the string buffer into which the URL
+     * will be added.
+     */
     public RecipeRequestConstructor(List<String> d, List<String> i)
     {
 	request = new StringBuffer();
@@ -30,9 +40,11 @@ public class RecipeRequestConstructor
 	ingredients = i;
     }
 
-    // This method will construct a search request using Bing.
-    // The method returns that search request to the caller
-    public String getRequest()
+    /**
+     * This method will construct a search request using Bing.
+     * The method returns that search request to the caller.
+     */
+    public String getRequest(double rndVal1, double rndVal2)
     {
 	int tmpIndex;
 	StringBuilder ingredientString = new StringBuilder();
@@ -51,10 +63,10 @@ public class RecipeRequestConstructor
     
 	// Create a set of search values from the array of 
 	// ingredients and dishes
-	tmpIndex = (int)(rnd.nextDouble()*ingredients.size());
+	tmpIndex = (int)(rndVal1*ingredients.size());
 	ingredientString.append(ingredients.get(tmpIndex));
 	ingredientString.append("+");
-	tmpIndex = (int)(rnd.nextDouble()*dishes.size());
+	tmpIndex = (int)(rndVal2*dishes.size());
 	ingredientString.append(dishes.get(tmpIndex));    
 	    
 	// Put those search values into the search string

@@ -30,25 +30,35 @@ import org.apache.commons.lang3.StringEscapeUtils;
  *****************************************************************/
 public class AllRecipesProxy
 {
-    // The array of recipes that this class find.
+    /**
+     * The array of recipes that this class find.
+     */
     private final ArrayList<HashMap<String,Object>> recipeList;
 
-    // The constructor for this class
-    // Initialize the recipeList
+    /** 
+     * Constructor - Initialize the recipeList
+     */
     public AllRecipesProxy() 
     {
 	recipeList = new ArrayList<>();
     }
 
-    // Return to the caller the recipeList and its contents
+    /**
+     * Return to the caller the recipeList and its contents
+     * @return 
+     */
     public ArrayList<HashMap<String,Object>> getRecipeList()
     {
 	return recipeList;
     }
 
-    // This method is used by ILMenuServlet.  It takes each recipe in 
-    // recipeHashes and sends a request to allrecipes.com to scale the request
-    // to "servings".
+    /**
+     * This method is used by ILMenuServlet.  It takes each recipe in 
+     * recipeHashes and sends a request to allrecipes.com to scale the request
+     * to "servings".
+     * @param recipeHashes
+     * @param servings
+     */
     public void generateRecipes(ArrayList<HashMap<String,String>> recipeHashes,
                                 int servings)
     {
@@ -78,10 +88,16 @@ public class AllRecipesProxy
         }
     }
     
-    // This method is called by generateRecipes.  This method does the heavy 
-    // lifting of sending the request to allrecipes.com to get a scaled recipe.  
-    // It then uses Regular Expressions to collect the ingredients in the 
-    //recipe
+    /**
+     * This method is called by generateRecipes.  This method does the heavy 
+     * lifting of sending the request to allrecipes.com to get a scaled recipe.  
+     * It then uses Regular Expressions to collect the ingredients in the 
+     * recipe.
+     * @param url
+     * @param referer
+     * @param servings
+     * @return 
+     */
     public HashMap<String,Object> loadRecipeWithReferer(String url, 
                                                         String referer, 
                                                         int servings)
@@ -259,9 +275,15 @@ public class AllRecipesProxy
         return recipeHash;
     }
     
-    // This method finds a recipe.  It calls a helper method
-    // to actually load a recipe.  For this method a recipe is 
-    // represented as a HashMap. 
+    /**
+     * This method finds a recipe.  It calls a helper method
+     * to actually load a recipe.  For this method a recipe is 
+     * represented as a HashMap. 
+     * @param url
+     * @param current_request_url
+     * @return 
+     * @throws java.net.MalformedURLException 
+     */
     public HashMap<String, String> generateRecipe(String url, 
                                                   String current_request_url)
                                                   throws MalformedURLException, 
@@ -283,10 +305,12 @@ public class AllRecipesProxy
         return returnHash;
     }
 
-    // This method is used to actually collect a recipe from allrecipes.com 
-    // It then uses Regular Expression to find the calories per serving in a 
-    // recipe.  It also finds the prep time for the recipe.  That information 
-    // is loaded into a HashMap.  That HashMap is then returned to the user.
+    /**
+     * This method is used to actually collect a recipe from allrecipes.com 
+     * It then uses Regular Expression to find the calories per serving in a 
+     * recipe.  It also finds the prep time for the recipe.  That information 
+     * is loaded into a HashMap.  That HashMap is then returned to the user.
+     */
     public HashMap<String,String> loadRecipeWithReferer(String url,
 							  String referer)
     {

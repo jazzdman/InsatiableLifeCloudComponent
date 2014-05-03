@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Date;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,13 +25,40 @@ import org.w3c.dom.NodeList;
  */
 public class ClientIDManager {
     
-    // 
+    /**
+     * A client ID is actually a time stamp, number of milliseconds since 
+     * January 1, 1970.  This number is the time that this class was first
+     * written.  As a security feature, All IDs must be later than this number.
+     */ 
     public static final String START_ID = "1396731101020";
+    
+    /**
+     * System.currentTimeMillis() returns a long.  The maximum number of digits
+     * in a long is 19.  As an added security feature, the client ID must
+     * be padded with zeros to make a string 19 chars long.
+     */
     public static final int CLIENT_ID_LENGTH = 19;
     
-    private HashMap<String,ClientID> clientList = new HashMap<>();
-    private BusyFlag bf;
+    /**
+     * This {@link HashMap} holds all of the clients that have accessed the web app
+     * The key is the ID for the client.  The value is the Client ID object
+     * that describes that client.
+     */
+    private HashMap<String,ClientID> clientList;
     
+    /**
+     * Since this is a singleton class, but will be accessed many times in many
+     * places, we need to make sure that its operations are thread safe.  This
+     * busy flag ensures that.
+     */
+    private final BusyFlag bf;
+    
+    /**
+     * The constructor for this class by creating the client list and populate the
+     * list.  This client list is not likely to ever need to be populated from
+     * file.  However, if the application is stopped, then serializeClientList
+     * should be called.
+     */
     private ClientIDManager() 
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -38,6 +67,7 @@ public class ClientIDManager {
         Element rootElement;
         NodeList tmpList;
         Node tmpNode;
+        clientList = new HashMap<>();
         
         // Read in the contents from an XML file.
         try 
@@ -61,8 +91,10 @@ public class ClientIDManager {
         bf = new BusyFlag();
     }
     
-    // This method saves the contents of the recipeList.
-    // This method likely will only be called when the ILMenuServlet is stopped.
+    /**
+     * This method saves the contents of the recipeList.
+     * This method likely will only be called when the ILMenuServlet is stopped.
+     */
     public void serializeClientList()
     {
         ClientID tmpID;
@@ -100,23 +132,39 @@ public class ClientIDManager {
         }
     }
     
+    /**
+     * 
+     * Get the {@link ClientID} associated with String ID.
+     * 
+     * @param ID 
+     * @return clientID associated with String ID
+     */
     public ClientID getClientID(String ID)
     {
         return clientList.get(ID);
     }
     
-    // The method that returns the static reference to this class
+    /**
+     * The method that returns the static reference to this class
+     */
     public static ClientIDManager getInstance() {
         return ClientIDManagerHolder.INSTANCE;
     }
     
-    // The inner class that makes this a Singleton.
+    /**
+     * The inner class that makes this a Singleton.
+     */
     private static class ClientIDManagerHolder 
     {
 
         private static final ClientIDManager INSTANCE = new ClientIDManager();
     }
     
+    /**
+     * Creates a client ID for the caller.  
+     * 
+     * @return the String associated with the created ClientID.
+     */
     public String createClientID()
     {
         long time;
@@ -125,36 +173,39 @@ public class ClientIDManager {
         Node rootElement, idNode, requestNode, associationsNode;
         bf.getBusyFlag();
         
+        // We save a clientID as an XML node.  So, we create them as such.
+        // If we can't create an XML document to start with, then the clientID
+        // doesn't get created.
         try
         {    
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         }
-        catch(Exception e)
+        catch(ParserConfigurationException e)
         {
-            
+            return null;
         }
             
+        // Create the ClientID node and its children.
         rootElement = doc.createElement("clientID");
         idNode = doc.createElement("ID");
         requestNode = doc.createElement("request");
         requestNode.setNodeValue(new Integer(1).toString());
         associationsNode = doc.createElement("associations");
-        
         rootElement.appendChild(idNode);
         rootElement.appendChild(requestNode);
         rootElement.appendChild(associationsNode);
        
+        // Create the clientID itself and buffer it with zeros
         time = System.currentTimeMillis();
         clientID = new StringBuffer();
-        
         clientID.append(Long.toString(time));
-        
         for(int i = clientID.length()+1;i < CLIENT_ID_LENGTH + 1;i++)
         {
             clientID.insert(0, "0");
         }
         idNode.setNodeValue(clientID.toString());
-            
+        
+        // Save the clientID to our list of IDs
         clientList.put(clientID.toString(), new ClientID(rootElement));  
         
         bf.freeBusyFlag();
@@ -162,6 +213,15 @@ public class ClientIDManager {
         return Long.toString(time);
     }
    
+    /**
+     * Check to see if the client ID is valid according to the following rules:
+     * 
+     * 1)  If the client ID is the correct length
+     * 2)  If the client ID is large enough number
+     * 3)  If the client ID is in the list of IDs we've created so far
+     * 
+     * @return whether or not a client ID is valid.
+     */
     public boolean validateClientID(String clientID)
     {
         StringBuffer idBuf = new StringBuffer();
@@ -187,7 +247,10 @@ public class ClientIDManager {
         isValid &= clientList.containsKey(clientID);
         
         // Update the number of requests
-        clientList.get(clientID).updateRequest();
+        if(isValid)
+        {
+            clientList.get(clientID).updateRequest(new Date());
+        }
         
         bf.freeBusyFlag();
         

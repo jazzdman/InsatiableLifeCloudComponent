@@ -1,30 +1,37 @@
 package common;
 
 
-/* Purpose : A helper class to enable thread safety with RecipeManager.
+/**
+ * 
+ *   Purpose : A helper class to enable thread safety with RecipeManager.
  *           Allows for an a mutex lock to be maintained over multiple
  *           method calls.
  *           This class is copied directly from Chapter 4 of Java Threads, 
  *           2nd edition, O'Reilly Media Inc., January 1999. 
+ * 
  */
 public class BusyFlag 
 {
-    //A reference to the thread that holds the flag
+    /**
+     * A reference to the thread that holds the flag
+     */
     private Thread busyflag;
 
-    /* Purpose : Constructor
-     * Method  : Initialize member variables
-     * Returns : Nothing
+    /**
+     * 
+     * Constructor - Initializes member variables.
+     *  
      */
     public BusyFlag()
     {
 	busyflag = null;
     }
 
-    /* Purpose : Attempt to get the busy flag, 
-     * Method  : Call tryGetBusyFlag, wait while the
-     *           method returns false
-     * Returns : Nothing
+    /**  
+     * 
+     * Attempt to get the busy flag. Call tryGetBusyFlag, wait while the
+     * method returns false. 
+     * 
      */
     public synchronized void getBusyFlag() 
     {
@@ -40,11 +47,10 @@ public class BusyFlag
         }
     }
 
-    /* Purpose : Attempt to take possession of the busyFlag
-     * Method  : Check to see if the current Thread is the one
-     *           holding the flag
-     * Returns : Whether the calling Thread is the holder of
-     *           the busy flag.
+    /**  
+     *
+     * Check to see if the current Thread is the one holding the flag.
+     * 
      */
     public synchronized boolean tryGetBusyFlag() 
     {
@@ -58,16 +64,15 @@ public class BusyFlag
 	{
             return true;
         }
-
-		
+        
         return false;
     }
 
-    /* Purpose : Attempt to free the busy flag
-     * Method  : If the calling thread is the one calling
-     *           this method, release the flag and alert 
-     *           any other waiting Threads.
-     * Returns : Nothing
+    /** 
+     * 
+     * If the calling thread is the one calling this method, release the flag 
+     * and alert any other waiting Threads.
+     * 
      */
     public synchronized void freeBusyFlag() 
     {
@@ -79,10 +84,10 @@ public class BusyFlag
         }
     }
 
-    /* Purpose : Show which Thread has the busy flag
-     * Method  : Return a member variable
-     * Returns : A reference to the Thread currently
-     *           holding the busy flag.
+    /**
+     * 
+     * Method  : Return a reference to the Thread currently holding the busy flag.
+     * 
      */
     public synchronized Thread getBusyFlagOwner() 
     {
