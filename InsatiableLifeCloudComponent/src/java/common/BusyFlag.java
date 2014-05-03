@@ -51,6 +51,7 @@ public class BusyFlag
      *
      * Check to see if the current Thread is the one holding the flag.
      * 
+     * @return 
      */
     public synchronized boolean tryGetBusyFlag() 
     {
@@ -88,6 +89,7 @@ public class BusyFlag
      * 
      * Method  : Return a reference to the Thread currently holding the busy flag.
      * 
+     * @return 
      */
     public synchronized Thread getBusyFlagOwner() 
     {

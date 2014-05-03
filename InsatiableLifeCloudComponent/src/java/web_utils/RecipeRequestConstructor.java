@@ -30,6 +30,8 @@ public class RecipeRequestConstructor
      * Initialize the list of dishes and ingredients, the random 
      * number generator, and the string buffer into which the URL
      * will be added.
+     * @param d
+     * @param i
      */
     public RecipeRequestConstructor(List<String> d, List<String> i)
     {
@@ -43,6 +45,9 @@ public class RecipeRequestConstructor
     /**
      * This method will construct a search request using Bing.
      * The method returns that search request to the caller.
+     * @param rndVal1
+     * @param rndVal2
+     * @return 
      */
     public String getRequest(double rndVal1, double rndVal2)
     {

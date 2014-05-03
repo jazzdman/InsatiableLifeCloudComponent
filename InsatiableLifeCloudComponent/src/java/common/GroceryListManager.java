@@ -43,6 +43,7 @@ public class GroceryListManager
     
     /**
      * The method that returns the static reference to this class
+     * @return 
      */
     public static GroceryListManager getInstance() {
         return GroceryListManagerHolder.INSTANCE;

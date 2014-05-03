@@ -310,6 +310,9 @@ public class AllRecipesProxy
      * It then uses Regular Expression to find the calories per serving in a 
      * recipe.  It also finds the prep time for the recipe.  That information 
      * is loaded into a HashMap.  That HashMap is then returned to the user.
+     * @param url
+     * @param referer
+     * @return 
      */
     public HashMap<String,String> loadRecipeWithReferer(String url,
 							  String referer)

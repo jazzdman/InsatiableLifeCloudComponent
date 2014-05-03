@@ -167,6 +167,7 @@ public class ClientID
      * with ID.  This method assumes that some other part of the application
      * has decided that ID is a valid one
      * 
+     * @param ID
      * @return the ID for this client
      * 
      */

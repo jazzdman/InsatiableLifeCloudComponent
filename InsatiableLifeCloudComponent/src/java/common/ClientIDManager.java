@@ -146,6 +146,7 @@ public class ClientIDManager {
     
     /**
      * The method that returns the static reference to this class
+     * @return 
      */
     public static ClientIDManager getInstance() {
         return ClientIDManagerHolder.INSTANCE;
@@ -220,6 +221,7 @@ public class ClientIDManager {
      * 2)  If the client ID is large enough number
      * 3)  If the client ID is in the list of IDs we've created so far
      * 
+     * @param clientID
      * @return whether or not a client ID is valid.
      */
     public boolean validateClientID(String clientID)

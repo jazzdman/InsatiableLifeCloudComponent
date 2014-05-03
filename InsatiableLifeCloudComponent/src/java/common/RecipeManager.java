@@ -113,6 +113,7 @@ public class RecipeManager implements Runnable
      *      3) A RecipeRequestConstructor
      *      4) A BusyFlag
      *      5) The recipeList
+     * @throws java.io.IOException
      */
     public RecipeManager() throws IOException
     {
@@ -146,6 +147,7 @@ public class RecipeManager implements Runnable
     
     /**
      * Return the {@link HashMap} of recipes that this object has collected.
+     * @return 
      */
     public HashMap<String, HashMap<String,String>> getRecipeList()
     {
