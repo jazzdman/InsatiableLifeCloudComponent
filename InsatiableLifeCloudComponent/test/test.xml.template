@@ -58,7 +58,12 @@
         </junit>
     </target>
 
-    <target name="output" depends="password, test">
+    <target name="javadoc">
+	<javadoc sourcepath="../src/java" destdir="../javadoc" />
+	<copydir src="../javadoc" dest="../../../Sites/jazzdman.dyndns.org/javadoc"/>
+    </target>
+
+    <target name="output" depends="password, test, javadoc">
         <mail
             user="jazzdman@gmail.com"
 	    password="${gmail.password}"
