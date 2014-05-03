@@ -90,7 +90,7 @@ public class RecipeManagerTest {
         try
         {
             
-            instance = new RecipeManager(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/");
+            instance = new RecipeManager();
             th = new Thread(instance);
             
             th.setDaemon(true);
@@ -116,7 +116,7 @@ public class RecipeManagerTest {
         RecipeManager instance = null;
         try
         {
-            instance = new RecipeManager(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/");
+            instance = new RecipeManager();
         } catch (Exception e)
         {
             fail("Failed to set up testFillRecipeList: "+ e.getMessage());
@@ -135,8 +135,8 @@ public class RecipeManagerTest {
         
         try
         {
-            instance = new RecipeManager(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/");
-            instance.serializeRecipeList(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/");
+            instance = new RecipeManager();
+            instance.serializeRecipeList();
             
         } catch (Exception e)
         {
