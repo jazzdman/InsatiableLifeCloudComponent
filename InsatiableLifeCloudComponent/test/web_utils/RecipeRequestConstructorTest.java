@@ -39,12 +39,12 @@ public class RecipeRequestConstructorTest
         try
         {
             filePath = new StringBuffer();
-            filePath.append(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/WEB-INF/conf/dishes.txt");
+            filePath.append(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/src/conf/dishes.txt");
 
             dishes = Files.readAllLines(Paths.get(filePath.toString()), StandardCharsets.US_ASCII);
             filePath.delete(0, filePath.length());
             
-            filePath.append(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/WEB-INF/conf/ingredients.txt");
+            filePath.append(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/src/conf/ingredients.txt");
             ingredients = Files.readAllLines(Paths.get(filePath.toString()), StandardCharsets.US_ASCII);
             
         } catch(Exception e)
@@ -64,7 +64,7 @@ public class RecipeRequestConstructorTest
     public void testGetRequest() {
         System.out.println("getRequest");
         double rndVal1 = 0.0;
-        double rndVal2 = 1.0;
+        double rndVal2 = .99;
         RecipeRequestConstructor instance;
         
         if(setupFailed)
