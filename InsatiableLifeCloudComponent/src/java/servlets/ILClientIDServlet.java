@@ -21,11 +21,27 @@ import javax.servlet.annotation.WebServlet;
 @WebServlet(value="/clientID")
 public class ILClientIDServlet extends HttpServlet {
     
-    // The operation the client has requested
+    /** 
+     * Indicate to a client that an error occurred while parsing the incoming
+     * request.
+     */
+    private static final int PARSE_ERROR = -1;
+    
+    /**
+     * Indicate to a client that an error occurred while attempting to associate
+     * one client ID with another.
+     */
+    private static final int ASSOCIATE_ERROR = -2;
+    
+    /**
+     * The operation the client has requested.
+     */
     private String operation;
     
-    // In the case that the user has requested an association, these are
-    // the strings/ client IDs to associate with one another
+    /**
+     * In the case that the user has requested an association, these are
+     * the strings/ client IDs to associate with one another.
+     */
     private String associateID;
     private String originalID;
     
@@ -64,7 +80,7 @@ public class ILClientIDServlet extends HttpServlet {
                 {    
                     response.setContentType("text/xml;charset=UTF-8");
                     writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                    writer.println("</error>");
+                    writer.println("<error>"+new Integer(PARSE_ERROR).toString()+"</error>");
                 }
                 break;
         }
@@ -149,7 +165,7 @@ public class ILClientIDServlet extends HttpServlet {
         // If both IDs are not valid, let the client know.
         else 
         {
-            pw.println("<associate>failure</associate>");
+            pw.println("<error>"+new Integer(ASSOCIATE_ERROR).toString()+"</error>");
         }
                          
         

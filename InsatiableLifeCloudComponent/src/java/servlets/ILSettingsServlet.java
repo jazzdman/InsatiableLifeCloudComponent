@@ -128,13 +128,13 @@ public class ILSettingsServlet extends HttpServlet
         if(!validateRequest(request))
         {
             respBuf.append("</params>");
-            respBuf.append("<param>"+ new Integer(VALIDATION_ERROR).toString() +"</param>");
+            respBuf.append("<error>"+ new Integer(VALIDATION_ERROR).toString() +"</error>");
             respBuf.append("</params>");
                 
         } else if(servletProblem)
         {
             respBuf.append("</params>");
-            respBuf.append("<param>"+ new Integer(SERVER_INIT_ERROR).toString() +"</param>");
+            respBuf.append("<error>"+ new Integer(SERVER_INIT_ERROR).toString() +"</error>");
             respBuf.append("</params>");
                 
         } else {

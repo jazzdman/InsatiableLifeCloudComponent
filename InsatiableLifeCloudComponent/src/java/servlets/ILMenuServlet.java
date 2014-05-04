@@ -153,7 +153,7 @@ public class ILMenuServlet extends HttpServlet
         // Indicate servlet error with count of -1
         if (servletProblem || recipeManager == null)
         {
-            responseString.append("<count>"+ new Integer(SERVER_INIT_ERROR).toString()+"</count>");
+            responseString.append("<error>"+ new Integer(SERVER_INIT_ERROR).toString()+"</error>");
             responseString.append("</recipes>");
             stillOK = false;
         }
@@ -163,7 +163,7 @@ public class ILMenuServlet extends HttpServlet
         // and have acceptable values.
         if (stillOK && !validateRequest(request))
         {
-            responseString.append("<count>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</count>");
+            responseString.append("<error>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</error>");
             responseString.append("</recipes>");
             stillOK = false;
         }
