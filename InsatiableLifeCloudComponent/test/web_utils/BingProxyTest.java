@@ -6,10 +6,17 @@
 
 package web_utils;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -19,19 +26,88 @@ import org.junit.Assert;
 public class BingProxyTest
 {
    
+    private List<String> dishes, ingredients;
+    private StringBuffer filePath;
+    boolean setupFailed;
+    
     public BingProxyTest() 
     {
+        setupFailed = false;
     }
     
     @Before
     public void setUp() 
     {
-       
+       try
+        {
+            filePath = new StringBuffer();
+            filePath.append(System.getProperty("user.home"));
+            filePath.append("/sandbox/InsatiableLifeCloudComponent/src/conf/dishes.txt");
+
+            dishes = Files.readAllLines(Paths.get(filePath.toString()), StandardCharsets.US_ASCII);
+            filePath.delete(0, filePath.length());
+            
+            filePath.append(System.getProperty("user.home"));
+            filePath.append("/sandbox/InsatiableLifeCloudComponent/src/conf/ingredients.txt");
+            ingredients = Files.readAllLines(Paths.get(filePath.toString()), StandardCharsets.US_ASCII);
+            
+        } catch(Exception e)
+        {
+            setupFailed = true;
+        }
     }
     
     @After
     public void tearDown() {
     }
+    
+     /**
+     * Test of getRequest method, of class RecipeRequestConstructor.
+     */
+    @Test
+    public void testGetRequest_positive() {
+        System.out.println("getRequest positive");
+        double rndVal1 = 0.0;
+        double rndVal2 = .99;
+        BingProxy instance;
+        
+        if(setupFailed)
+        {
+            fail("Setup failed.");
+            return;
+        }
+         
+        instance = new BingProxy(dishes,ingredients);
+        String expResult;
+        expResult = "http://www.bing.com/search?q=anchovies+ziti+site%3Aallrecipes.com";
+        String result = instance.getRequest(rndVal1, rndVal2);
+        assertEquals(expResult, result);
+        
+    }
+    
+    /**
+     * Test of getRequest method, of class RecipeRequestConstructor.
+     */
+    @Test
+    public void testGetRequest_negative() {
+        System.out.println("getRequest negative");
+        double rndVal1 = 0.0;
+        double rndVal2 = .99;
+        BingProxy instance;
+        
+        if(setupFailed)
+        {
+            fail("Setup failed.");
+            return;
+        }
+         
+        instance = new BingProxy(dishes,ingredients);
+        String result = instance.getRequest(rndVal1, rndVal2);
+        assertFalse(result == null);
+        
+    }
+    
+    
 
     /**
      * Test of findRecipes method, of class BingProxy.
@@ -41,8 +117,11 @@ public class BingProxyTest
     {
         System.out.println("findRecipes");
         String searchString = "http://www.bing.com/search?q=beef+russian+site%3Aallrecipes.com";
-        BingProxy instance = new BingProxy();
-        instance.findRecipes(searchString);
+        BingProxy instance = new BingProxy(dishes,ingredients);
+        double rndVal1 = 0.0;
+        double rndVal2 = .99;
+        
+        instance.findRecipes(rndVal1, rndVal2);
         // TODO review the generated test code and remove the default call to fail.
         Assert.assertTrue(instance.getSearchResults().size() > 0 );
     }
@@ -56,8 +135,11 @@ public class BingProxyTest
         System.out.println("filterRecipes");
         int rndIndex = 2;
         String searchString = "http://www.bing.com/search?q=beef+russian+site%3Aallrecipes.com";
-        BingProxy instance = new BingProxy();
-        instance.findRecipes(searchString);
+        BingProxy instance = new BingProxy(dishes,ingredients);
+        double rndVal1 = 0.0;
+        double rndVal2 = .99;
+        
+        instance.findRecipes(rndVal1, rndVal2);
         instance.filterRecipes(rndIndex);
         // TODO review the generated test code and remove the default call to fail.
         Assert.assertTrue(instance.getRecipeURLs().size() > 0 );

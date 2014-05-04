@@ -18,7 +18,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import web_utils.RecipeRequestConstructor;
 import web_utils.AllRecipesProxy;
 import web_utils.BingProxy;
 
@@ -61,11 +60,6 @@ public class RecipeManager implements Runnable
      * The list of recipes that this class maintains
      */
     private final HashMap<String, HashMap<String,String>> recipeList;
-      
-    /**
-     * An object to create a random recipe search for Bing.
-     */
-    private final RecipeRequestConstructor recipeRequestConstructor;
         
     /**
      * An object that calls to allrecipes.com with a URL created by the
@@ -133,10 +127,8 @@ public class RecipeManager implements Runnable
        
         
         // Instantiate member variables
-        recipeRequestConstructor = 
-                    new RecipeRequestConstructor(dishes, ingredients);
         allRecipesProxy = new AllRecipesProxy();
-        bingProxy = new BingProxy();
+        bingProxy = new BingProxy(dishes, ingredients);
         bf = new BusyFlag();
         recipeList = new HashMap();
         
@@ -198,12 +190,9 @@ public class RecipeManager implements Runnable
             
             try 
             {
-                // Get the URL to send to Bing
-                current_request_url = recipeRequestConstructor.getRequest(rnd.nextDouble(),
-                                                                          rnd.nextDouble());
-	
+                
                 // Get recipe URLs from Bing
-                bingProxy.findRecipes(current_request_url);
+                bingProxy.findRecipes(rnd.nextDouble(), rnd.nextDouble());
                 
                 // Get a random number based on the number of search
                 // results
@@ -222,7 +211,7 @@ public class RecipeManager implements Runnable
                 for(String url:bingProxy.getRecipeURLs())
                 {
                     // Get a recipe from allrecipes.com
-                    recipeHash = allRecipesProxy.generateRecipe(url, current_request_url);
+                    recipeHash = allRecipesProxy.generateRecipe(url, bingProxy.getSearchString());
                     
                     // Throw out recipes that have problems
                     if(recipeHash == null)

@@ -20,7 +20,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({web_utils.AllRecipesProxyTest.class, 
                      web_utils.BingProxyTest.class, 
                      common.ClientIDTest.class, 
-                     web_utils.RecipeRequestConstructorTest.class,
                      common.BusyFlagTest.class})
 public class InsatiableLifeJUnitTest 
 {
