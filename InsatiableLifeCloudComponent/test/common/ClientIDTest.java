@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -26,6 +26,7 @@ public class ClientIDTest {
     boolean setupFailed;
     ClientID instance;
     String id;
+    long time;
     
     public ClientIDTest() 
     {
@@ -36,10 +37,9 @@ public class ClientIDTest {
     @Before
     public void setUp() 
     {
-        long time;
         Document doc;
-        StringBuffer clientID;
-        Node rootElement, idNode, requestNode, associationsNode;
+        Element rootElement, idNode, requestNode, associationsNode;
+        StringBuffer clientIDSB;
         
         try
         {    
@@ -54,22 +54,20 @@ public class ClientIDTest {
         // Create the ClientID node and its children.
         rootElement = doc.createElement("clientID");
         idNode = doc.createElement("ID");
-        requestNode = doc.createElement("request");
-        requestNode.setNodeValue(new Integer(1).toString());
-        associationsNode = doc.createElement("associations");
-        rootElement.appendChild(idNode);
-        rootElement.appendChild(requestNode);
-        rootElement.appendChild(associationsNode);
-       
         // Create the clientID itself and buffer it with zeros
-        time = System.currentTimeMillis();
-        clientID = new StringBuffer();
-        clientID.append(Long.toString(time));
-        for(int i = clientID.length()+1;i < CLIENT_ID_LENGTH + 1;i++)
+        clientIDSB = new StringBuffer();
+        clientIDSB.append(id);
+        for(int i = clientIDSB.length()+1;i < CLIENT_ID_LENGTH + 1;i++)
         {
-            clientID.insert(0, "0");
+            clientIDSB.insert(0, "0");
         }
-        idNode.setNodeValue(clientID.toString());
+        idNode.appendChild(doc.createTextNode(clientIDSB.toString()));
+        rootElement.appendChild(idNode);
+        
+        requestNode = doc.createElement("request");
+        requestNode.appendChild(doc.createTextNode(new Long(time).toString()));
+        rootElement.appendChild(requestNode);
+       
         instance = new ClientID(rootElement);
     }
     
@@ -124,7 +122,8 @@ public class ClientIDTest {
     @Test
     public void testLastRequest() {
         System.out.println("lastRequest");
-        Date now = new Date();
+        long now;
+        now = System.currentTimeMillis();
         if(setupFailed)
         {
             fail("Setup failed.");

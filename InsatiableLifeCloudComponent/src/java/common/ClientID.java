@@ -6,10 +6,9 @@
 
 package common;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import java.util.ArrayList;
-import java.util.Date;
 import java.text.DateFormat;
 import java.io.IOException;
 import java.io.BufferedWriter;
@@ -32,7 +31,7 @@ public class ClientID
     /**
      * The last time the client accessed the web application
      */
-    private Date latestRequest;
+    private long latestRequest;
     
     /**
      * The other clients that are associated with this one
@@ -47,28 +46,19 @@ public class ClientID
      * ID
      * 
      */ 
-    public ClientID(Node clientID)
+    public ClientID(Element clientID)
     {
-        String tmpString;
-        NodeList tmpList;
-        
         // Break apart the XML node to get the member variables for this clientID.
-        ID = clientID.getChildNodes().item(0).getNodeValue();
+        ID = clientID.getElementsByTagName("ID").item(0).getFirstChild().getNodeValue();
         try
         {
-            latestRequest = DateFormat.getInstance().parse(clientID.getChildNodes().item(1).getNodeValue());
+            latestRequest = Long.parseLong(clientID.getElementsByTagName("request").item(0).getFirstChild().getNodeValue());
         }
         catch(Exception e)
         {
-            latestRequest = new Date();
+            latestRequest = System.currentTimeMillis();
         }
-        tmpList = clientID.getChildNodes().item(2).getChildNodes();
         associations = new ArrayList();
-        
-        for(int i = 0; i < tmpList.getLength();i++)
-        {
-            associations.add(tmpList.item(i).getNodeValue());
-        }
     }
     
     /**
@@ -102,7 +92,7 @@ public class ClientID
      * @param lr - the {@link Date} to set updateRequest to
      * 
      */
-    public void updateRequest(Date lr)
+    public void updateRequest(long lr)
     {
         latestRequest = lr;
     }
@@ -112,7 +102,7 @@ public class ClientID
      * @return the {@link Date} that this client ID was last seen 
      * 
      */
-    public Date getLatestRequest()
+    public long getLatestRequest()
     {
         return latestRequest;
     }
@@ -151,7 +141,7 @@ public class ClientID
        
         bw.write("<clientID>");
         bw.write("<ID>"+ID+"</ID>");
-        bw.write("<request>"+latestRequest.toString() +"</request>");
+        bw.write("<request>"+new Long(latestRequest).toString() +"</request>");
         bw.write("<associations>");
         for(String s:associations)
         {

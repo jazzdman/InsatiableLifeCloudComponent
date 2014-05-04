@@ -106,7 +106,7 @@ public class ILClientIDServlet extends HttpServlet {
         }
         
         // Set the operation
-        operation = keys[0];
+        operation = values[0];
         
         // If the request is for an association, make sure we have the right
         // number of values

@@ -66,7 +66,7 @@ public class ClientIDManager {
         Document recipeDoc;
         Element rootElement;
         NodeList tmpList;
-        Node tmpNode;
+        Element tmpElement;
         clientList = new HashMap<>();
         
         // Read in the contents from an XML file.
@@ -79,9 +79,9 @@ public class ClientIDManager {
             
             for(int i = 0; i < tmpList.getLength(); i++)
             {
-                tmpNode = tmpList.item(i);   
-                clientList.put(tmpNode.getChildNodes().item(0).getNodeValue(), 
-                               new ClientID(tmpNode));
+                tmpElement = (Element)tmpList.item(i);   
+                clientList.put(tmpElement.getElementsByTagName("clientID").item(0).getNodeValue(), 
+                               new ClientID(tmpElement));
             }
         } catch (Exception e)
         {
@@ -169,9 +169,10 @@ public class ClientIDManager {
     public String createClientID()
     {
         long time;
-        StringBuffer clientID;
+        StringBuffer clientIDSB;
         Document doc = null;
-        Node rootElement, idNode, requestNode, associationsNode;
+        Element rootElement;
+        Element idNode, requestNode;
         bf.getBusyFlag();
         
         // We save a clientID as an XML node.  So, we create them as such.
@@ -189,25 +190,23 @@ public class ClientIDManager {
         // Create the ClientID node and its children.
         rootElement = doc.createElement("clientID");
         idNode = doc.createElement("ID");
-        requestNode = doc.createElement("request");
-        requestNode.setNodeValue(new Integer(1).toString());
-        associationsNode = doc.createElement("associations");
-        rootElement.appendChild(idNode);
-        rootElement.appendChild(requestNode);
-        rootElement.appendChild(associationsNode);
-       
         // Create the clientID itself and buffer it with zeros
         time = System.currentTimeMillis();
-        clientID = new StringBuffer();
-        clientID.append(Long.toString(time));
-        for(int i = clientID.length()+1;i < CLIENT_ID_LENGTH + 1;i++)
+        clientIDSB = new StringBuffer();
+        clientIDSB.append(Long.toString(time));
+        for(int i = clientIDSB.length()+1;i < CLIENT_ID_LENGTH + 1;i++)
         {
-            clientID.insert(0, "0");
+            clientIDSB.insert(0, "0");
         }
-        idNode.setNodeValue(clientID.toString());
+        idNode.appendChild(doc.createTextNode(clientIDSB.toString()));
+        rootElement.appendChild(idNode);
         
+        requestNode = doc.createElement("request");
+        requestNode.appendChild(doc.createTextNode(new Long(time).toString()));
+        rootElement.appendChild(requestNode);
+       
         // Save the clientID to our list of IDs
-        clientList.put(clientID.toString(), new ClientID(rootElement));  
+        clientList.put(clientIDSB.toString(), new ClientID(rootElement));  
         
         bf.freeBusyFlag();
         
@@ -251,7 +250,7 @@ public class ClientIDManager {
         // Update the number of requests
         if(isValid)
         {
-            clientList.get(clientID).updateRequest(new Date());
+            clientList.get(clientID).updateRequest(System.currentTimeMillis());
         }
         
         bf.freeBusyFlag();
