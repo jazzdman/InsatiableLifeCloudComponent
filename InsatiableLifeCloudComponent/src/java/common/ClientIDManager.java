@@ -5,13 +5,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Date;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -80,7 +78,7 @@ public class ClientIDManager {
             for(int i = 0; i < tmpList.getLength(); i++)
             {
                 tmpElement = (Element)tmpList.item(i);   
-                clientList.put(tmpElement.getElementsByTagName("clientID").item(0).getNodeValue(), 
+                clientList.put(tmpElement.getElementsByTagName("clientID").item(0).getFirstChild().getNodeValue(), 
                                new ClientID(tmpElement));
             }
         } catch (Exception e)
@@ -108,7 +106,7 @@ public class ClientIDManager {
         if(oldClientFile.exists())
             oldClientFile.delete();
         
-        // Write out the contents of the recipeList as an XML file.
+        // Write out the contents of the clientList as an XML file.
         try 
         {
             bw = new BufferedWriter(new FileWriter(newClientFile));
