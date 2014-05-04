@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -59,47 +60,63 @@ public class ClientIDManager {
      */
     private ClientIDManager() 
     {
+       
+        clientList = new HashMap<>();   
+        bf = new BusyFlag();
+        
+    }
+    
+    
+    /**
+     * This method fills the recipeList from clientlist.xml, if it exists.
+     * This method likely will only be called when the ILMenuServlet is stopped.
+     * @param realPath
+     * @throws javax.xml.parsers.ParserConfigurationException
+     * @throws org.xml.sax.SAXException
+     * @throws java.io.IOException
+     */
+    public void fillClientList(String realPath) throws ParserConfigurationException, 
+                                                       SAXException, 
+                                                       IOException
+    {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
         Document recipeDoc;
         Element rootElement;
         NodeList tmpList;
         Element tmpElement;
-        clientList = new HashMap<>();
+        File xmlFile = new File(realPath+"/WEB-INF/conf/clientlist.xml");
         
         // Read in the contents from an XML file.
-        try 
-        {
-            db = dbf.newDocumentBuilder();
-            recipeDoc = db.parse(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/clientlist.xml");
-            rootElement = recipeDoc.getDocumentElement();
-            tmpList = rootElement.getElementsByTagName("clientID");
-            
-            for(int i = 0; i < tmpList.getLength(); i++)
-            {
-                tmpElement = (Element)tmpList.item(i);   
-                clientList.put(tmpElement.getElementsByTagName("clientID").item(0).getFirstChild().getNodeValue(), 
-                               new ClientID(tmpElement));
-            }
-        } catch (Exception e)
-        {
-            
-        }
+        if(!xmlFile.exists())
+            return;
         
-        bf = new BusyFlag();
+        db = dbf.newDocumentBuilder();
+        recipeDoc = db.parse(xmlFile.getAbsolutePath());
+        rootElement = recipeDoc.getDocumentElement();
+        tmpList = rootElement.getElementsByTagName("clientID");
+            
+        for(int i = 0; i < tmpList.getLength(); i++)
+        {
+            tmpElement = (Element)tmpList.item(i);   
+            clientList.put(tmpElement.getElementsByTagName("clientID").item(0).getFirstChild().getNodeValue(), 
+                           new ClientID(tmpElement));
+        }
     }
     
     /**
      * This method saves the contents of the recipeList.
      * This method likely will only be called when the ILMenuServlet is stopped.
+     * @param realPath
+     * @throws java.io.IOException
      */
-    public void serializeClientList()
+    public void serializeClientList(String realPath) throws IOException
     {
         ClientID tmpID;
         BufferedWriter bw;
         HashMap<String,String> recipe;
-        File oldClientFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/clientlist.xml");
-        File newClientFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/clientlist.xml");
+        File oldClientFile = new File(realPath+"/WEB-INF/conf/clientlist.xml");
+        File newClientFile = new File(realPath+"/WEB-INF/conf/clientlist.xml");
         
         // Delete any file that already exists.  We want to overwrite the 
         // contents.
@@ -107,27 +124,22 @@ public class ClientIDManager {
             oldClientFile.delete();
         
         // Write out the contents of the clientList as an XML file.
-        try 
-        {
-            bw = new BufferedWriter(new FileWriter(newClientFile));
+        bw = new BufferedWriter(new FileWriter(newClientFile));
             
-            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-            bw.write("<clients>\r\n");
+        bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        bw.write("<clients>\r\n");
         
-            for(String keyOne:clientList.keySet())
-            {
-                tmpID = clientList.get(keyOne);
-                tmpID.serialize(bw);
-            }
-        
-            bw.write("\r\n</clients>");
-            
-            bw.flush();
-            bw.close();
-            
-        } catch (IOException ioe)
+        for(String keyOne:clientList.keySet())
         {
+            tmpID = clientList.get(keyOne);
+            tmpID.serialize(bw);
         }
+        
+        bw.write("\r\n</clients>");
+            
+        bw.flush();
+        bw.close();
+            
     }
     
     /**

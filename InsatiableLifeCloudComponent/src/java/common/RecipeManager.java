@@ -13,10 +13,12 @@ import java.util.HashMap;
 import java.util.Random;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import web_utils.AllRecipesProxy;
 import web_utils.BingProxy;
@@ -44,18 +46,7 @@ public class RecipeManager implements Runnable
      * Used to pick out lists of recipes from the BingProxy.
      */
     private final Random rnd;
-    
-    /**
-     * A temporary path to open files on the server
-     */
-    private final StringBuffer filePath;
-    
-    /**
-     * The lists of dishes and ingredients used by 
-     * the RecipeRequestConstructor
-     */
-    private List<String> dishes = null, ingredients = null;
-    
+   
     /**
      * The list of recipes that this class maintains
      */
@@ -71,7 +62,7 @@ public class RecipeManager implements Runnable
      * An object that sends the results from the RecipeRequestConstructor
      * to Bing and saves the allrecipes.com URLs.
      */
-    private final BingProxy bingProxy;
+    private BingProxy bingProxy;
     
     /**
      * This starts true and the Thread keeps running until this is false.
@@ -109,32 +100,16 @@ public class RecipeManager implements Runnable
      *      5) The recipeList
      * @throws java.io.IOException
      */
-    public RecipeManager() throws IOException
+    public RecipeManager()
     {
         rnd = new Random(System.currentTimeMillis());
-        
-        filePath = new StringBuffer();
-        filePath.append(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/dishes.txt");
         running = true;
-          
-	dishes = Files.readAllLines(Paths.get(filePath.toString()),
-					StandardCharsets.US_ASCII);
-        filePath.delete(0, filePath.length());
-            
-        filePath.append(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/ingredients.txt");
-	ingredients = Files.readAllLines(Paths.get(filePath.toString()),
-					StandardCharsets.US_ASCII);
-       
         
         // Instantiate member variables
         allRecipesProxy = new AllRecipesProxy();
-        bingProxy = new BingProxy(dishes, ingredients);
         bf = new BusyFlag();
         recipeList = new HashMap();
         
-        // Fill the recipeList if we have something to 
-        fillRecipeList();
-            
     }
     
     /**
@@ -325,9 +300,16 @@ public class RecipeManager implements Runnable
     
     /**
      * This method reads in the contents of the recipeList from a file.
+     * @param realPath
+     * @throws java.io.IOException
+     * @throws javax.xml.parsers.ParserConfigurationException
+     * @throws org.xml.sax.SAXException
      */
-    private void fillRecipeList()
+    public void fillRecipeList(String realPath) throws IOException,
+                                                       ParserConfigurationException,
+                                                       SAXException
     {
+        List<String> dishes, ingredients;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
         Document recipeDoc;
@@ -336,46 +318,62 @@ public class RecipeManager implements Runnable
         HashMap<String,String> tempHash;
         Node recipeNode, tempNode;
         String urlValue=null;
+        StringBuffer filePath;
+        File xmlFile = new File(realPath+"/WEB-INF/conf/recipelist.xml");
         
         // Read in the contents from an XML file.
-        try 
-        {
-            db = dbf.newDocumentBuilder();
-            recipeDoc = db.parse(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/recipelist.xml");
-            rootElement = recipeDoc.getDocumentElement();
-            rcpList = rootElement.getElementsByTagName("recipe");
+        filePath = new StringBuffer();
+        filePath.append(realPath);
+        filePath.append("/WEB-INF/conf/dishes.txt");
+        
+        dishes = Files.readAllLines(Paths.get(filePath.toString()),
+					StandardCharsets.US_ASCII);
+        filePath.delete(0, filePath.length());
             
-            for(int i = 0; i < rcpList.getLength(); i++)
+        filePath.append(realPath);
+        filePath.append("/WEB-INF/conf/ingredients.txt");
+        ingredients = Files.readAllLines(Paths.get(filePath.toString()),
+					StandardCharsets.US_ASCII);
+   
+        bingProxy = new BingProxy(dishes, ingredients);
+            
+        if(!xmlFile.exists())
+            return;
+        
+        db = dbf.newDocumentBuilder();
+        recipeDoc = db.parse(xmlFile.getAbsolutePath());
+        rootElement = recipeDoc.getDocumentElement();
+        rcpList = rootElement.getElementsByTagName("recipe");
+            
+        for(int i = 0; i < rcpList.getLength(); i++)
+        {
+            recipeNode = rcpList.item(i);
+            recipeChildren = recipeNode.getChildNodes();
+            tempHash = new HashMap();
+            for(int j = 0; j < recipeChildren.getLength(); j++)
             {
-                recipeNode = rcpList.item(i);
-                recipeChildren = recipeNode.getChildNodes();
-                tempHash = new HashMap();
-                for(int j = 0; j < recipeChildren.getLength(); j++)
-                {
-                    tempNode = recipeChildren.item(j);
-                    if(tempNode.getNodeName().matches("url"))
+                tempNode = recipeChildren.item(j);
+                if(tempNode.getNodeName().matches("url"))
                         urlValue = tempNode.getNodeValue();
-                    tempHash.put(tempNode.getNodeName(), tempNode.getNodeValue());
-                }
-                
-                recipeList.put(urlValue, tempHash);
+                tempHash.put(tempNode.getNodeName(), tempNode.getNodeValue());
             }
-        } catch (Exception e)
-        {
-            
+                
+            recipeList.put(urlValue, tempHash);
         }
     }
     
     /**
      * This method saves the contents of the recipeList.
      * This method likely will only be called when the ILMenuServlet is stopped.
+     * @param realPath
+     * @throws java.io.IOException
      */
-    public void serializeRecipeList()
+    public void serializeRecipeList(String realPath) throws IOException
     {
         BufferedWriter bw;
         HashMap<String,String> recipe;
-        File oldRecipeFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/recipelist.xml");
-        File newRecipeFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/recipelist.xml");
+        File oldRecipeFile = new File(realPath+"/WEB-INF/conf/recipelist.xml");
+        File newRecipeFile = new File(realPath+"/WEB-INF/conf/recipelist.xml");
         
         // Delete any file that already exists.  We want to overwrite the 
         // contents.
@@ -383,31 +381,26 @@ public class RecipeManager implements Runnable
             oldRecipeFile.delete();
         
         // Write out the contents of the recipeList as an XML file.
-        try 
-        {
-            bw = new BufferedWriter(new FileWriter(newRecipeFile));
+        bw = new BufferedWriter(new FileWriter(newRecipeFile));
             
-            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-            bw.write("<recipes>\r\n");
+        bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        bw.write("<recipes>\r\n");
         
-            for(String keyOne:recipeList.keySet())
+        for(String keyOne:recipeList.keySet())
+        {
+            bw.write("\t<recipe>\r\n");
+            recipe = recipeList.get(keyOne);
+            for(String keyTwo:recipe.keySet())
             {
-                bw.write("\t<recipe>\r\n");
-                recipe = recipeList.get(keyOne);
-                for(String keyTwo:recipe.keySet())
-                {
-                    bw.write("\t\t<"+ keyTwo+">"+recipe.get(keyTwo)+"</"+keyTwo+">\r\n");
-                }
-                    
-                bw.write("\t</recipe>\r\n");
+                bw.write("\t\t<"+ keyTwo+">"+recipe.get(keyTwo)+"</"+keyTwo+">\r\n");
             }
-        
-            bw.write("</recipes>");
-            bw.flush();
-            bw.close();
-            
-        } catch (IOException ioe)
-        {
+                    
+            bw.write("\t</recipe>\r\n");
         }
+        
+        bw.write("</recipes>");
+        bw.flush();
+        bw.close();
+            
     }
 }

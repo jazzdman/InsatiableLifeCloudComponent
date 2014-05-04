@@ -2,13 +2,16 @@ package common;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * This class is used to control access to the pantries of all clients.
@@ -49,8 +52,14 @@ public class PantryListManager {
     
     /**
      * This method reads in the contents of the recipeList from a file.
+     * @param realPath
+     * @throws javax.xml.parsers.ParserConfigurationException
+     * @throws org.xml.sax.SAXException
+     * @throws java.io.IOException
      */
-    private void fillPantryList()
+    public void fillPantryList(String realPath) throws ParserConfigurationException,
+                                                       SAXException,
+                                                       IOException
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
@@ -60,30 +69,30 @@ public class PantryListManager {
         HashMap<String,String> tempHash;
         Node recipeNode, tempNode;
         String urlValue=null;
+        File xmlFile = new File(realPath+"/WEB-INF/conf/pantrylist.xml");
         
         // Read in the contents from an XML file.
-        try 
-        {
-            db = dbf.newDocumentBuilder();
-            recipeDoc = db.parse(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/pantrylist.xml");
-            rootElement = recipeDoc.getDocumentElement();
+        if(!xmlFile.exists())
+            return;
+        
+        db = dbf.newDocumentBuilder();
+        recipeDoc = db.parse(xmlFile.getAbsolutePath());
+        rootElement = recipeDoc.getDocumentElement();
          
-        } catch (Exception e)
-        {
-            
-        }
     }
  
     /**
      * This method saves the contents of the recipeList.
      * This method likely will only be called when the ILMenuServlet is stopped.
+     * 
+     * @param realPath
      */
-    public void serializePantryList()
+    public void serializePantryList(String realPath)
     {
         BufferedWriter bw;
         HashMap<String,String> recipe;
-        File oldGroceryFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/pantrylist.xml");
-        File newGroceryFile = new File(System.getenv("CATALINA_HOME")+"/webapps/InsatiableLifeCloudComponent/WEB-INF/conf/pantrylist.xml");
+        File oldGroceryFile = new File(realPath +"/WEB-INF/conf/pantrylist.xml");
+        File newGroceryFile = new File(realPath +"/WEB-INF/conf/pantrylist.xml");
         
       
     }

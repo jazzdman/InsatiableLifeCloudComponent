@@ -34,27 +34,30 @@ public class MenuListener implements ServletContextListener
     public void contextDestroyed(ServletContextEvent sce)
     {
         ServletContext servletContext = sce.getServletContext();
+        String filePath = servletContext.getRealPath("/");
         
         //Get the RecipeManager, stop the thread that is running it, save
         // the contents of the RecipeManager and remove the RecipeManager from
         // the application context.
         RecipeManager rm = (RecipeManager)servletContext.getAttribute("rm");
-        if(rm != null)
+        if(rm == null)
         {
-            rm.end();
-            rm.serializeRecipeList();
+            return;
         }
+        rm.end();
         servletContext.removeAttribute("rm");
         
-        // Save the contents of the ClientIDManager
-        ClientIDManager.getInstance().serializeClientList();
-        
-        // Save the contents of the GroceryListManager
-        GroceryListManager.getInstance().serializeGroceryList();
-        
-        // Save the contents of the PantryManager
-        PantryListManager.getInstance().serializePantryList();
-            
+        // Save the contents of the various managers
+        try
+        {
+            rm.serializeRecipeList(filePath);
+            ClientIDManager.getInstance().serializeClientList(filePath);
+            GroceryListManager.getInstance().serializeGroceryList(filePath);
+            PantryListManager.getInstance().serializePantryList(filePath);
+        } catch (Exception e)
+        {
+        }
+           
     }
     
     /**
@@ -72,6 +75,7 @@ public class MenuListener implements ServletContextListener
         ServletContext servletContext = sce.getServletContext();
         RecipeManager rm;
         Thread th;
+        String filePath = servletContext.getRealPath("/");
         
         // Create the RecipeManager, start the RecipeManager with a thread.  
         // Use this method instead of having RecipeManager extend Thread.  
@@ -79,12 +83,24 @@ public class MenuListener implements ServletContextListener
         try
         {
             rm = new RecipeManager();
+            rm.fillRecipeList(filePath);
             th = new Thread(rm);
             th.setDaemon(true);
             th.start();
-        } catch (IOException e)
+        } catch (Exception e)
         {
             rm = null;
+        }
+        
+        try 
+        {
+            GroceryListManager.getInstance().fillGroceryList(filePath);
+            PantryListManager.getInstance().fillPantryList(filePath);
+            ClientIDManager.getInstance().fillClientList(filePath);
+            
+        } catch (Exception e)
+        {
+            
         }
         
         // If we were able to instantiate the RecipeManager, add it to the 
@@ -93,5 +109,6 @@ public class MenuListener implements ServletContextListener
         {
             servletContext.setAttribute("rm", rm);
         }
+        
     }
 }
