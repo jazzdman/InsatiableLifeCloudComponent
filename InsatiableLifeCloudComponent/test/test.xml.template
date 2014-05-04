@@ -60,7 +60,9 @@
 
     <target name="javadoc">
 	<javadoc sourcepath="../src/java" destdir="../javadoc" />
-	<copydir src="../javadoc" dest="../../../Sites/jazzdman.dyndns.org/javadoc"/>
+	<copy todir="../../../Sites/jazzdman.dyndns.org/javadoc">
+	  <fileset dir="../javadoc" />
+	</copy>
     </target>
 
     <target name="output" depends="password, test, javadoc">
