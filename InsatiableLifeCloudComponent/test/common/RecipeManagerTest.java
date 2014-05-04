@@ -136,7 +136,7 @@ public class RecipeManagerTest {
         try
         {
             instance = new RecipeManager();
-            instance.serializeRecipeList();
+            instance.serializeRecipeList(testFile2.getAbsolutePath());
             
         } catch (Exception e)
         {
