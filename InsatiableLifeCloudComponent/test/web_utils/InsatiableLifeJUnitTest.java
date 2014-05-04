@@ -17,7 +17,11 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 //@Suite.SuiteClasses({web_utils.RecipeManagerTest.class, web_utils.AllRecipesProxyTest.class, web_utils.BingProxyTest.class})
-@Suite.SuiteClasses({web_utils.AllRecipesProxyTest.class, web_utils.BingProxyTest.class, common.ClientIDTest.class, web_utils.RecipeRequestConstructorTest.class})
+@Suite.SuiteClasses({web_utils.AllRecipesProxyTest.class, 
+                     web_utils.BingProxyTest.class, 
+                     common.ClientIDTest.class, 
+                     web_utils.RecipeRequestConstructorTest.class,
+                     common.BusyFlagTest.class})
 public class InsatiableLifeJUnitTest 
 {
     
