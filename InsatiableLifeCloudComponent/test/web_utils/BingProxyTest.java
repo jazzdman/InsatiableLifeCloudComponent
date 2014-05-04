@@ -117,9 +117,22 @@ public class BingProxyTest
     {
         System.out.println("findRecipes");
         String searchString = "http://www.bing.com/search?q=beef+russian+site%3Aallrecipes.com";
+        
+        if(setupFailed)
+        {
+            fail("Setup failed.");
+            return;
+        }
+        
         BingProxy instance = new BingProxy(dishes,ingredients);
         double rndVal1 = 0.0;
         double rndVal2 = .99;
+        
+        if(setupFailed)
+        {
+            fail("Setup failed.");
+            return;
+        }
         
         instance.findRecipes(rndVal1, rndVal2);
         // TODO review the generated test code and remove the default call to fail.
@@ -135,6 +148,14 @@ public class BingProxyTest
         System.out.println("filterRecipes");
         int rndIndex = 2;
         String searchString = "http://www.bing.com/search?q=beef+russian+site%3Aallrecipes.com";
+        
+        if(setupFailed)
+        {
+            fail("Setup failed.");
+            return;
+        }
+        
+        
         BingProxy instance = new BingProxy(dishes,ingredients);
         double rndVal1 = 0.0;
         double rndVal2 = .99;
