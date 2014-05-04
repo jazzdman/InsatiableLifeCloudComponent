@@ -56,12 +56,12 @@ public class AllRecipesProxyTest {
     // Test of loadRecipeWithReferer method, of class AllRecipesProxy.
     //
     @Test
-    public void testLoadRecipeWithReferer_3args() 
+    public void testLoadRecipeWithReferer_3args_positive() 
     {
         BufferedReader in;
         String tmp;
         File newRecipeFile = new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/test/web_utils/beef-and-rice-medley.html");
-        System.out.println("loadRecipeWithReferer");
+        System.out.println("loadRecipeWithReferer positive");
         String url = "http://allrecipes.com/recipe/beef-and-rice-medley/";
         String referer = "http://www.google.com/search?q=beef+rice+site%3Dallrecipes.com";
         int servings = 2;
@@ -98,8 +98,45 @@ public class AllRecipesProxyTest {
     // Test of loadRecipeWithReferer method, of class AllRecipesProxy.
     //
     @Test
-    public void testLoadRecipeWithReferer_String_String() {
-        System.out.println("loadRecipeWithReferer");
+    public void testLoadRecipeWithReferer_3args_negative() 
+    {
+        BufferedReader in;
+        String tmp;
+        File newRecipeFile = new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/test/web_utils/beef-and-rice-medley.html");
+        System.out.println("loadRecipeWithReferer negative");
+        String url = "http://allrecipes.com/recipe/beef-and-rice-medley/";
+        String referer = "http://www.google.com/search?q=beef+rice+site%3Dallrecipes.com";
+        int servings = 2;
+        
+        AllRecipesProxy instance = new AllRecipesProxy();
+        
+        // Try to open the input stream from the connection.
+	try 
+	{
+            in = new BufferedReader(
+		 new FileReader(newRecipeFile));
+            
+            while((tmp = in.readLine()) != null)
+	    {
+		page.append(tmp);
+	    }
+	}catch (Exception e)
+        {
+            fail("Unable to set up test testLoadRecipeWithReferer_3args negative.");
+            return;
+        }
+        
+        HashMap<String, Object> result = instance.loadRecipeWithReferer(url, referer, servings);
+        assertFalse(result.isEmpty());
+        
+    }
+    
+    //
+    // Test of loadRecipeWithReferer method, of class AllRecipesProxy.
+    //
+    @Test
+    public void testLoadRecipeWithReferer_String_String_positive() {
+        System.out.println("loadRecipeWithReferer positive");
         String url = "http://allrecipes.com/recipe/beef-and-rice-medley/";
         String referer = "http://www.google.com/search?q=beef+rice+site%3Dallrecipes.com";
         AllRecipesProxy instance = new AllRecipesProxy();
@@ -115,6 +152,20 @@ public class AllRecipesProxyTest {
         
         HashMap<String, String> result = instance.loadRecipeWithReferer(url, referer);
         assertEquals(expResult, result);
+    }
+    
+    //
+    // Test of loadRecipeWithReferer method, of class AllRecipesProxy.
+    //
+    @Test
+    public void testLoadRecipeWithReferer_String_String_negative() {
+        System.out.println("loadRecipeWithReferer netative");
+        String url = "http://allrecipes.com/recipe/beef-and-rice-medley/";
+        String referer = "http://www.google.com/search?q=beef+rice+site%3Dallrecipes.com";
+        AllRecipesProxy instance = new AllRecipesProxy();
+        
+        HashMap<String, String> result = instance.loadRecipeWithReferer(url, referer);
+        assertFalse(result.isEmpty());
     }
 
     /**
