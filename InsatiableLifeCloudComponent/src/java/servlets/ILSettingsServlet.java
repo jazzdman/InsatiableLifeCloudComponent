@@ -91,10 +91,13 @@ public class ILSettingsServlet extends HttpServlet
 	
     }
 
-    @Override
     /**
+     *
      * Return a name for this servlet
+     * 
+     * @return
      */
+    @Override
     public String getServletInfo()
     {
 	return "Insatiable Life Settings Servlet";
