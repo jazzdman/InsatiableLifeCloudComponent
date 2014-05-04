@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -22,6 +23,23 @@ import java.util.regex.Matcher;
  */
 public class BingProxy
 {
+    
+    private String searchString;
+    
+    /**
+     * A string that will hold the results created by this class.
+     */
+    private StringBuffer request;
+    
+    /**
+     * A random number generator used to define a random search URL.
+     */
+    private final Random rnd;
+    
+    /**
+     * A list of dishes and ingredients used to create the URL.
+     */
+    private final List<String> dishes, ingredients;
 
     /**
      * The list of URLs that this class finds
@@ -57,12 +75,66 @@ public class BingProxy
 
     /**
      * Initialize the lists of URLs
+     * @param d
+     * @param i
      */
-    public BingProxy()
+    public BingProxy(List<String> d, List<String> i)
     {
 	recipeURLs = new HashMap();
         searchResults = new ArrayList();
         
+        request = new StringBuffer();
+	rnd = new Random(System.currentTimeMillis());
+
+	dishes = d;
+	ingredients = i;
+        
+    }
+    
+    public String getSearchString()
+    {
+        return searchString;
+    }
+    
+     /**
+     * This method will construct a search request using Bing.
+     * The method returns that search request to the caller.
+     * @param rndVal1
+     * @param rndVal2
+     * @return 
+     */
+    public String getRequest(double rndVal1, double rndVal2)
+    {
+	int tmpIndex;
+	StringBuilder ingredientString = new StringBuilder();
+	String searchString = 
+	    "http://www.bing.com/search?q=%i+site%3Aallrecipes.com";
+	String tmp;
+       
+	// Make sure the request is empty to begin with
+	if(request.length() > 0)
+	{
+	    request.delete(0, request.length());
+	}
+    
+	// Add in the basic search string
+	request.append(searchString);
+    
+	// Create a set of search values from the array of 
+	// ingredients and dishes
+	tmpIndex = (int)(rndVal1*ingredients.size());
+	ingredientString.append(ingredients.get(tmpIndex));
+	ingredientString.append("+");
+	tmpIndex = (int)(rndVal2*dishes.size());
+	ingredientString.append(dishes.get(tmpIndex));    
+	    
+	// Put those search values into the search string
+	tmp = request.toString();
+	tmp = tmp.replaceAll("%i", ingredientString.toString());
+	request = new StringBuffer(tmp);
+    
+	// Return the created query URL
+	return request.toString();
     }
 
     /**
@@ -78,10 +150,13 @@ public class BingProxy
      * This method is called to actually carry out the search for
      * allrecipes.com URLs using Bing.  It uses Regular Expressions
      * to grab a random page of Bing results.
-     * @param searchString
+     * @param rndVal1
+     * @param rndVal2
      */
-    public void findRecipes(String searchString) 
+    public void findRecipes(double rndVal1, double rndVal2) 
     {
+        
+        String searchString = getRequest(rndVal1, rndVal2);
 	// The RE that finds the various pages from the search results
 	String pageRegex = "<a href=\"(/search[^\"]*)\"[^>]*>\\d</a>";
 	String tmp;
