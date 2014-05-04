@@ -6,6 +6,7 @@
 
 package web_utils;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -116,5 +117,49 @@ public class AllRecipesProxyTest {
         assertEquals(expResult, result);
     }
 
+    /**
+     * Test of getRecipeList method, of class AllRecipesProxy.
+     *
+    @Test
+    public void testGetRecipeList() {
+        System.out.println("getRecipeList");
+        AllRecipesProxy instance = new AllRecipesProxy();
+        ArrayList<HashMap<String, Object>> expResult = null;
+        ArrayList<HashMap<String, Object>> result = instance.getRecipeList();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of generateRecipes method, of class AllRecipesProxy.
+     *
+    @Test
+    public void testGenerateRecipes() {
+        System.out.println("generateRecipes");
+        ArrayList<HashMap<String, String>> recipeHashes = null;
+        int servings = 0;
+        AllRecipesProxy instance = new AllRecipesProxy();
+        instance.generateRecipes(recipeHashes, servings);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of generateRecipe method, of class AllRecipesProxy.
+     *
+    @Test
+    public void testGenerateRecipe() throws Exception {
+        System.out.println("generateRecipe");
+        String url = "";
+        String current_request_url = "";
+        AllRecipesProxy instance = new AllRecipesProxy();
+        HashMap<String, String> expResult = null;
+        HashMap<String, String> result = instance.generateRecipe(url, current_request_url);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+    */
     
 }
