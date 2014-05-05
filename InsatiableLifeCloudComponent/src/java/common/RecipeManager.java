@@ -189,17 +189,19 @@ public class RecipeManager implements Runnable
                     recipeHash = allRecipesProxy.generateRecipe(url, bingProxy.getSearchString());
                     
                     // Throw out recipes that have problems
-                    if(recipeHash == null)
+                    if(recipeHash == null || recipeHash.get("error") != null)
                     {
                         continue;
                     }
                     
-                    tmpTitle = (String) recipeHash.get("title");
-                    if(recipeHash.get("error") != null )
+                    if(recipeHash.get("title") == null ||
+                       recipeHash.get("calories") == null ||
+                       recipeHash.get("preptime") == null)
                     {
                         continue;
                     }
-                       
+                    
+                    tmpTitle = (String) recipeHash.get("title");   
                     if(tmpTitle.matches(""))
                     {
                         continue;

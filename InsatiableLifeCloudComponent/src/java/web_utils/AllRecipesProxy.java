@@ -73,10 +73,6 @@ public class AllRecipesProxy
                                   (String)recipeHash.get("referer"), 
                                   servings);
                 
-                title = (String)(String)tempHash.get("title");
-                if(title.matches(""))
-                    continue;
-                
                 recipeList.add(tempHash);
                 
             } catch (Exception e)
@@ -495,6 +491,8 @@ public class AllRecipesProxy
             {
 
                 recipeHash.put("error","Couldn't find calories");
+                recipeHash.put("title", "");
+                return recipeHash;
 	    }
 
 	}
@@ -536,6 +534,8 @@ public class AllRecipesProxy
 	else {
 	 
             recipeHash.put("error","Couldn't find minutes.");
+            recipeHash.put("title", "");
+            return recipeHash;
 	}
     
 	// Get the title of the recipe
