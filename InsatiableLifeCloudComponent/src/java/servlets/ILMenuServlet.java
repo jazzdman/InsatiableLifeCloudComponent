@@ -46,21 +46,11 @@ public class ILMenuServlet extends HttpServlet
      * Indicate an error in the init method
      */
     private static final int SERVER_INIT_ERROR = -1;
-    
-    /**
-     * Indicate an empty recipe search list
-     */
-    private static final int BING_LIST_EMPTY_ERROR = -2;
-    
+   
     /**
      * Indicate invalid request parameters
      */
     private static final int INVALID_REQUEST_PARAMETERS_ERROR = -3;
-    
-    /**
-     * Indicate invalid request parameters
-     */
-    private static final int SERVER_COLLECT_ERROR = -5;
     
     /**
      * The number of minutes in an hour
