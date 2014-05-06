@@ -34,6 +34,12 @@ public class ILClientIDServlet extends HttpServlet {
     private static final int ASSOCIATE_ERROR = -2;
     
     /**
+     * Indicate to a client that an error occurred while attempting to create
+     * a clientID.
+     */
+    private static final int CREATE_ERROR = -3;
+    
+    /**
      * The operation the client has requested.
      */
     private String operation;
@@ -160,7 +166,8 @@ public class ILClientIDServlet extends HttpServlet {
            ClientIDManager.getInstance().validateClientID(associateID))
         {
             ClientIDManager.getInstance().getClientID(originalID).addAssociation(associateID);
-            pw.println("<associate>success</associate>");      
+            ClientIDManager.getInstance().getClientID(associateID).addAssociation(originalID);
+            pw.println("<associate>success</associate>");       
         }
         // If both IDs are not valid, let the client know.
         else 
@@ -183,15 +190,22 @@ public class ILClientIDServlet extends HttpServlet {
         // Ask for a client ID from the ClientIDManager
         String clientID = ClientIDManager.getInstance().createClientID();
         
+        // Return the result to the client.
+        pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        
         // Make sure the clientID is valid.
         if(clientID == null)
         {
-            clientID = new Integer(-1).toString();
+            pw.println("<error>"+ CREATE_ERROR +"</error>");
+           
+        } else {
+            
+            pw.println("<clientID>"+clientID+"</clientID>");
+            
         }
        
-        // Return the result to the client.
-        pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        pw.println("<clientID>"+clientID+"</clientID>");  
+        
+          
         
     }
 

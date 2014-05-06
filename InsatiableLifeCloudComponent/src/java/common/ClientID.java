@@ -69,7 +69,8 @@ public class ClientID
      */
     public void addAssociation(String id)
     {
-        associations.add(id);
+        if(!isAssociated(id))
+            associations.add(id);
     }
     
     /**
