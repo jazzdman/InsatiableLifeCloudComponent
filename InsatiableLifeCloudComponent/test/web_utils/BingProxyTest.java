@@ -117,13 +117,6 @@ public class BingProxyTest
     {
         System.out.println("findRecipes");
         String searchString = "http://www.bing.com/search?q=beef+russian+site%3Aallrecipes.com";
-        
-        if(setupFailed)
-        {
-            fail("Setup failed.");
-            return;
-        }
-        
         BingProxy instance = new BingProxy(dishes,ingredients);
         double rndVal1 = 0.0;
         double rndVal2 = .99;
@@ -131,6 +124,12 @@ public class BingProxyTest
         if(setupFailed)
         {
             fail("Setup failed.");
+            return;
+        }
+        
+        if(instance == null)
+        {
+            fail("Instance is null.");
             return;
         }
         
@@ -148,17 +147,21 @@ public class BingProxyTest
         System.out.println("filterRecipes");
         int rndIndex = 2;
         String searchString = "http://www.bing.com/search?q=beef+russian+site%3Aallrecipes.com";
+        BingProxy instance = new BingProxy(dishes,ingredients);
+        double rndVal1 = 0.0;
+        double rndVal2 = .99;
         
-        if(setupFailed)
+         if(setupFailed)
         {
             fail("Setup failed.");
             return;
         }
         
-        
-        BingProxy instance = new BingProxy(dishes,ingredients);
-        double rndVal1 = 0.0;
-        double rndVal2 = .99;
+        if(instance == null)
+        {
+            fail("Instance is null.");
+            return;
+        }
         
         instance.findRecipes(rndVal1, rndVal2);
         instance.filterRecipes(rndIndex);
