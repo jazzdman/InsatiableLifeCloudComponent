@@ -29,10 +29,14 @@ public class BingProxyTest
     private List<String> dishes, ingredients;
     private StringBuffer filePath;
     boolean setupFailed;
+    double rndVal1;
+    double rndVal2;
     
     public BingProxyTest() 
     {
         setupFailed = false;
+        rndVal1 = 0.99;
+        rndVal2 = 0.0;
     }
     
     @Before
@@ -67,8 +71,6 @@ public class BingProxyTest
     @Test
     public void testGetRequest_positive() {
         System.out.println("getRequest positive");
-        double rndVal1 = 0.0;
-        double rndVal2 = .99;
         BingProxy instance;
         
         if(setupFailed)
@@ -79,7 +81,7 @@ public class BingProxyTest
          
         instance = new BingProxy(dishes,ingredients);
         String expResult;
-        expResult = "http://www.bing.com/search?q=anchovies+ziti+site%3Aallrecipes.com";
+        expResult = "http://www.bing.com/search?q=veal+bake+site%3Aallrecipes.com";
         String result = instance.getRequest(rndVal1, rndVal2);
         assertEquals(expResult, result);
         
@@ -91,8 +93,6 @@ public class BingProxyTest
     @Test
     public void testGetRequest_negative() {
         System.out.println("getRequest negative");
-        double rndVal1 = 0.0;
-        double rndVal2 = .99;
         BingProxy instance;
         
         if(setupFailed)
@@ -116,10 +116,7 @@ public class BingProxyTest
     public void testFindRecipes() 
     {
         System.out.println("findRecipes");
-        String searchString = "http://www.bing.com/search?q=beef+russian+site%3Aallrecipes.com";
         BingProxy instance = new BingProxy(dishes,ingredients);
-        double rndVal1 = 0.0;
-        double rndVal2 = .99;
         
         if(setupFailed)
         {
@@ -146,10 +143,8 @@ public class BingProxyTest
     public void testFilterRecipes() {
         System.out.println("filterRecipes");
         int rndIndex = 2;
-        String searchString = "http://www.bing.com/search?q=beef+russian+site%3Aallrecipes.com";
         BingProxy instance = new BingProxy(dishes,ingredients);
-        double rndVal1 = 0.0;
-        double rndVal2 = .99;
+        
         
          if(setupFailed)
         {

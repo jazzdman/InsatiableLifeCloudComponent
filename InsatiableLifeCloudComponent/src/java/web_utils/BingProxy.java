@@ -170,11 +170,10 @@ public class BingProxy
 	    (HttpURLConnection)new URL(searchString).openConnection();
 
         } catch (IOException e) {
-            return;
-        } finally {
-           if(connection != null)
+            if(connection != null)
                connection.disconnect(); 
-        }
+            return;
+        } 
         
         try
         {
@@ -183,10 +182,9 @@ public class BingProxy
 		 new InputStreamReader(
 		     connection.getInputStream()));
         } catch(IOException e) { 
-            return;
-        } finally {
             connection.disconnect();
-        }
+            return;
+        } 
 
 
 	// Read the results from Bing
@@ -263,10 +261,9 @@ public class BingProxy
 		         connection.getInputStream()));
             } catch(IOException e)
             {
-                return;
-            } finally {
                 if(connection != null)
                     connection.disconnect();
+                return;
             }
             
             
