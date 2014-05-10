@@ -6,16 +6,16 @@
     </tstamp>
 
     <target name="compile_src" >
-	<javac srcdir="DIR_NAME/src/java" 
-	       destdir="DIR_NAME/src/java" 
-               classpath="DIR_NAME/src/libs/*.jar:DIR_NAME/src/java">
+	<javac srcdir="DIR_NAME/trunk/src/java" 
+	       destdir="DIR_NAME/trunk/src/java" 
+               classpath="DIR_NAME/trunk/src/libs/*.jar:DIR_NAME/trunk/src/java">
         </javac>
     </target>
 
     <target name="compile_test" depends="compile_src" >
-	<javac srcdir="DIR_NAME/test" 
-	       destdir="DIR_NAME/test" 
-               classpath="DIR_NAME/test/libs/*.jar:DIR_NAME/src/java">
+	<javac srcdir="DIR_NAME/trunk/test" 
+	       destdir="DIR_NAME/trunk/test" 
+               classpath="DIR_NAME/trunk/test/libs/*.jar:DIR_NAME/trunk/src/java">
              <exclude name="*.txt" />
              <exclude name="libs/*.jar" />
              <exclude name="test.xml" />
@@ -35,7 +35,7 @@
    
     <target name="task" depends="jar">
         <taskdef resource="MyAntTasks.properties" 
-	     classpath="DIR_NAME/test/libs/mytasks.jar" />
+	     classpath="DIR_NAME/trunk/test/libs/mytasks.jar" />
     </target>
 
     <target name="password" depends="task">
@@ -54,7 +54,7 @@
             <test 
 	    	  name="web_utils.InsatiableLifeJUnitTest"
 		  outfile="test_result.${test_output.date}"
-		  todir="DIR_NAME/test" /> 
+		  todir="DIR_NAME/trunk/test" /> 
         </junit>
     </target>
 
@@ -78,7 +78,7 @@
 	    subject="Nightly test results for ${test_output.date}">
                 <to address="jazzdman@gmail.com" />
                 <from address="jazzdman@gmail.com" />
-                <message src="DIR_NAME/test/test_result.${test_output.date}.txt" />
+                <message src="DIR_NAME/trunk/test/test_result.${test_output.date}.txt" />
         </mail>
     </target>
 </project>
