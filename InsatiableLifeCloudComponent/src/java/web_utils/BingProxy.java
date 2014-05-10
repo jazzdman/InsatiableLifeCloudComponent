@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -23,6 +22,8 @@ import java.util.regex.Matcher;
  */
 public class BingProxy
 {
+    
+    String searchString;
     
     /**
      * A string that will hold the results created by this class.
@@ -81,6 +82,15 @@ public class BingProxy
 	dishes = d;
 	ingredients = i;
         
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public String getSearchString()
+    {
+        return searchString;
     }
     
      /**
@@ -143,7 +153,7 @@ public class BingProxy
     public void findRecipes(double rndVal1, double rndVal2) 
     {
         
-        String searchString = getRequest(rndVal1, rndVal2);
+        searchString = getRequest(rndVal1, rndVal2);
 	// The RE that finds the various pages from the search results
 	String pageRegex = "<a href=\"(/search[^\"]*)\"[^>]*>\\d</a>";
 	String tmp;
