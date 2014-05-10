@@ -135,7 +135,7 @@ public class BingProxyTest
         
         instance.findRecipes(rndVal1, rndVal2);
         // TODO review the generated test code and remove the default call to fail.
-        assertTrue(instance.getSearchResults().size() > 0 );
+        assertTrue("For some reason this fails." , instance.getSearchResults().size() > 0 );
     }
 
 
@@ -166,7 +166,7 @@ public class BingProxyTest
         instance.findRecipes(rndVal1, rndVal2);
         instance.filterRecipes(rndIndex);
         // TODO review the generated test code and remove the default call to fail.
-        assertTrue(instance.getRecipeURLs().size() > 0 );
+        assertTrue("For some reason this fails." ,instance.getRecipeURLs().size() > 0 );
     }
     
 }
