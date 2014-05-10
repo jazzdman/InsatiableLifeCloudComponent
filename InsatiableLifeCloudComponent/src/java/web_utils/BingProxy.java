@@ -24,17 +24,10 @@ import java.util.regex.Matcher;
 public class BingProxy
 {
     
-    private String searchString;
-    
     /**
      * A string that will hold the results created by this class.
      */
     private StringBuffer request;
-    
-    /**
-     * A random number generator used to define a random search URL.
-     */
-    private final Random rnd;
     
     /**
      * A list of dishes and ingredients used to create the URL.
@@ -84,16 +77,10 @@ public class BingProxy
         searchResults = new ArrayList();
         
         request = new StringBuffer();
-	rnd = new Random(System.currentTimeMillis());
 
 	dishes = d;
 	ingredients = i;
         
-    }
-    
-    public String getSearchString()
-    {
-        return searchString;
     }
     
      /**
@@ -172,12 +159,11 @@ public class BingProxy
             connection = 
 	    (HttpURLConnection)new URL(searchString).openConnection();
 
-        } catch (IOException e)
-        {
-            if(connection != null)
-               connection.disconnect();
-            
+        } catch (IOException e) {
             return;
+        } finally {
+           if(connection != null)
+               connection.disconnect(); 
         }
         
         try
@@ -186,10 +172,10 @@ public class BingProxy
             in = new BufferedReader(
 		 new InputStreamReader(
 		     connection.getInputStream()));
-        } catch(IOException e)
-        {
-            connection.disconnect();
+        } catch(IOException e) { 
             return;
+        } finally {
+            connection.disconnect();
         }
 
 
@@ -200,15 +186,11 @@ public class BingProxy
             {
                 bingPage.append(tmp).append("\r\n)");
             }
-        } catch (IOException e)
-        {
-            connection.disconnect();
+        } catch (IOException e) {
             return;
+        } finally {
+            connection.disconnect();
         }
-        
-
-	// Close that HTTPURLConnection
-	connection.disconnect();
 
 	// Get the links to all the pages of Bing results
         ptrn = Pattern.compile(pageRegex, Pattern.DOTALL);
@@ -271,9 +253,10 @@ public class BingProxy
 		         connection.getInputStream()));
             } catch(IOException e)
             {
+                return;
+            } finally {
                 if(connection != null)
                     connection.disconnect();
-                return;
             }
             
             
@@ -287,8 +270,10 @@ public class BingProxy
             } catch (IOException e)
             {
                 
+            } finally {
+                connection.disconnect();
             }
-            connection.disconnect();
+            
 	    
         }   
 

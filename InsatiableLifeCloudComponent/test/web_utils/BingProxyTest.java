@@ -13,9 +13,9 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
@@ -136,7 +136,7 @@ public class BingProxyTest
         
         instance.findRecipes(rndVal1, rndVal2);
         // TODO review the generated test code and remove the default call to fail.
-        Assert.assertTrue(instance.getSearchResults().size() > 0 );
+        assertTrue(instance.getSearchResults().size() > 0 );
     }
 
 
@@ -163,7 +163,7 @@ public class BingProxyTest
         instance.findRecipes(rndVal1, rndVal2);
         instance.filterRecipes(rndIndex);
         // TODO review the generated test code and remove the default call to fail.
-        Assert.assertTrue(instance.getRecipeURLs().size() > 0 );
+        assertTrue(instance.getRecipeURLs().size() > 0 );
     }
     
 }
