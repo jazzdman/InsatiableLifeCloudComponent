@@ -45,14 +45,14 @@ public class BingProxyTest
        try
         {
             filePath = new StringBuffer();
-            filePath.append(System.getProperty("user.home"));
-            filePath.append("/sandbox/InsatiableLifeCloudComponent/src/conf/dishes.txt");
+            filePath.append(System.getProperty("basedir"));
+            filePath.append("/src/conf/dishes.txt");
 
             dishes = Files.readAllLines(Paths.get(filePath.toString()), StandardCharsets.US_ASCII);
             filePath.delete(0, filePath.length());
             
-            filePath.append(System.getProperty("user.home"));
-            filePath.append("/sandbox/InsatiableLifeCloudComponent/src/conf/ingredients.txt");
+            filePath.append(System.getProperty("basedir"));
+            filePath.append("/src/conf/ingredients.txt");
             ingredients = Files.readAllLines(Paths.get(filePath.toString()), StandardCharsets.US_ASCII);
             
         } catch(Exception e)

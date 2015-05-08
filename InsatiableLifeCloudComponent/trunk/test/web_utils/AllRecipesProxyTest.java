@@ -60,7 +60,7 @@ public class AllRecipesProxyTest {
     {
         BufferedReader in;
         String tmp;
-        File newRecipeFile = new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/test/web_utils/beef-and-rice-medley.html");
+        File newRecipeFile = new File(System.getProperty("basedir")+"/test/web_utils/beef-and-rice-medley.html");
         System.out.println("loadRecipeWithReferer positive");
         String url = "http://allrecipes.com/recipe/beef-and-rice-medley/";
         String referer = "http://www.google.com/search?q=beef+rice+site%3Dallrecipes.com";
@@ -102,7 +102,7 @@ public class AllRecipesProxyTest {
     {
         BufferedReader in;
         String tmp;
-        File newRecipeFile = new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/test/web_utils/beef-and-rice-medley.html");
+        File newRecipeFile = new File(System.getProperty("basedir")+"/test/web_utils/beef-and-rice-medley.html");
         System.out.println("loadRecipeWithReferer negative");
         String url = "http://allrecipes.com/recipe/beef-and-rice-medley/";
         String referer = "http://www.google.com/search?q=beef+rice+site%3Dallrecipes.com";
@@ -212,5 +212,4 @@ public class AllRecipesProxyTest {
         fail("The test case is a prototype.");
     }
     */
-    
 }
