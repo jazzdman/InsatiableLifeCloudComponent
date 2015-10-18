@@ -109,7 +109,7 @@ public class AllRecipesProxy
         String titleRegex = "<title>\\s*(.*?) - Allrecipes.com";
         // The Regular Expression used to find ingredients in a recipe
         String ingredientsRegex = 
-        "class=\"ingredient-amount\">(.*?)</span>.*?class=\"ingredient-name\">(.*?)</span>";
+        "class=\"recipe-ingred_text added\".*?itemprop=\"ingredients\">(.*?)</span>";
         String userAgent, tmp;
         // The connection we will make to allrecipes.com
         HttpURLConnection connection;
@@ -257,9 +257,8 @@ public class AllRecipesProxy
         while(mtchr.find())
         {
             tmpMatch1 = mtchr.group(1);
-            tmpMatch2 = mtchr.group(2);
-            if(tmpMatch1 != null && tmpMatch2 != null)
-            ingredientArray.add( tmpMatch1 + " " + tmpMatch2);
+            if(tmpMatch1 != null)
+            ingredientArray.add( tmpMatch1);
 	}
 	     
 	// Save the collected information into a dictionary to be passed
@@ -322,7 +321,7 @@ public class AllRecipesProxy
 	// An RE to help us find the number of calories per serving
 	// in a recipe
 	String calorieRegex1 = 
-	"<span id=\"lblNutrientValue\">(\\d+)</span> kcal"; 
+	"<li class=\"nutrientLine__item--amount\" itemprop=\"calories\"><span>(\\d+)</span> kcal</li>"; 
         String calorieRegex2 = "equals (\\d+) calories";
 	// An RE to help us find out how long this recipe takes to 
 	// prepare the recipe
