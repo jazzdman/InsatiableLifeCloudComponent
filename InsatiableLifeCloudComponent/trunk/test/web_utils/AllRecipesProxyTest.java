@@ -36,15 +36,15 @@ public class AllRecipesProxyTest {
     @Before
     public void setUp() 
     {
-        ingredientArray.add("1/2 pound ground beef");
-        ingredientArray.add("1/4 cup diced onion");
-        ingredientArray.add("1-1/4 cups water");
-        ingredientArray.add("1/2 cup uncooked rice");
-        ingredientArray.add("1/2 cube beef bouillon");
-        ingredientArray.add("1/4 teaspoon ground black pepper");
-        ingredientArray.add("1/2 (14.5 ounce) can diced tomatoes");
-        ingredientArray.add("1/2 cup diced green bell pepper");
-        ingredientArray.add("1/2 (8 ounce) package mozzarella cheese");
+        ingredientArray.add("1 pound ground beef");
+        ingredientArray.add("1/2 cup diced onion");
+        ingredientArray.add("2 1/2 cups water");
+        ingredientArray.add("1 cup uncooked rice");
+        ingredientArray.add("1 cube beef bouillon");
+        ingredientArray.add("1/2 teaspoon ground black pepper");
+        ingredientArray.add("1 (14.5 ounce) can diced tomatoes");
+        ingredientArray.add("1 cup diced green bell pepper");
+        ingredientArray.add("1 (8 ounce) package mozzarella cheese");
     }
     
     @After
@@ -60,7 +60,7 @@ public class AllRecipesProxyTest {
     {
         BufferedReader in;
         String tmp;
-        File newRecipeFile = new File(System.getProperty("basedir")+"/test/web_utils/beef-and-rice-medley.html");
+        File newRecipeFile = new File(System.getProperty("user.dir") +"/test/web_utils/beef-and-rice-medley.html");
         System.out.println("loadRecipeWithReferer positive");
         String url = "http://allrecipes.com/recipe/beef-and-rice-medley/";
         String referer = "http://www.google.com/search?q=beef+rice+site%3Dallrecipes.com";
@@ -83,7 +83,7 @@ public class AllRecipesProxyTest {
 	    }
 	}catch (Exception e)
         {
-            fail("Unable to set up test testLoadRecipeWithReferer_3args.");
+            fail("Unable to set up test testLoadRecipeWithReferer_3args:" + e.getMessage());
             return;
         }
         expResult.put("page",page.toString());
@@ -102,7 +102,7 @@ public class AllRecipesProxyTest {
     {
         BufferedReader in;
         String tmp;
-        File newRecipeFile = new File(System.getProperty("basedir")+"/test/web_utils/beef-and-rice-medley.html");
+        File newRecipeFile = new File( System.getProperty("user.dir") + "/test/web_utils/beef-and-rice-medley.html");
         System.out.println("loadRecipeWithReferer negative");
         String url = "http://allrecipes.com/recipe/beef-and-rice-medley/";
         String referer = "http://www.google.com/search?q=beef+rice+site%3Dallrecipes.com";
@@ -122,7 +122,7 @@ public class AllRecipesProxyTest {
 	    }
 	}catch (Exception e)
         {
-            fail("Unable to set up test testLoadRecipeWithReferer_3args negative.");
+            fail("Unable to set up test testLoadRecipeWithReferer_3args negative." + e.getMessage());
             return;
         }
         
