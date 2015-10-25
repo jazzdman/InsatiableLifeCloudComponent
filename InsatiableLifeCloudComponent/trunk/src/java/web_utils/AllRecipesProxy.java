@@ -109,7 +109,7 @@ public class AllRecipesProxy
         String titleRegex = "<title>\\s*(.*?) - Allrecipes.com";
         // The Regular Expression used to find ingredients in a recipe
         String ingredientsRegex = 
-        "class=\"recipe-ingred_text added\".*?itemprop=\"ingredients\">(.*?)</span>";
+        "class=\"recipe-ingred_txt.*?itemprop=\"ingredients\">(.*?)</span>";
         String userAgent, tmp;
         // The connection we will make to allrecipes.com
         HttpURLConnection connection;
@@ -325,7 +325,7 @@ public class AllRecipesProxy
         String calorieRegex2 = "equals (\\d+) calories";
 	// An RE to help us find out how long this recipe takes to 
 	// prepare the recipe
-        String timeRegex = "title=\"Ready in (.*?)\"";
+        String timeRegex = "itemprop=\"totalTime\".*?class=\"prepTime__item--time\">(\\d+)</span>";
 	String userAgent, tmp;
 	// The connection we will make to allrecipes.com
 	HttpURLConnection connection;
