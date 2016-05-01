@@ -116,12 +116,13 @@ public class AllRecipesProxy
         // The array of ingredients
         List<String> ingredientArray = new ArrayList<>(); 
         List<String> matches;
-        BufferedReader in;
+        BufferedReader in = null;
         GZIPInputStream gis;
         InputStream is = null;
         Pattern ptrn;
         Matcher mtchr;
         String tmpMatch1, tmpMatch2;
+        int responseCode = 0;
 
         // Create a request and set header fields to make it 
         // look like we're sending this from a web browser.
@@ -159,14 +160,16 @@ public class AllRecipesProxy
         connection.setRequestProperty("Accept-Encoding", "gzip,deflate");
         connection.setRequestProperty("Connection", "keep-alive");	    
 	       
+        
         recipePage = new StringBuffer();
 	        
         // Read the response from the webserver.  Assume that we will get
         // back a gzip'ed response.
         try 
         {
-            gis = new GZIPInputStream(connection.getInputStream(), 
-                      connection.getContentLength());
+            responseCode = connection.getResponseCode();
+            
+            gis = new GZIPInputStream(connection.getInputStream());
             in = new BufferedReader(new InputStreamReader(gis, "ISO-8859-1"));
             
         } 
@@ -190,8 +193,7 @@ public class AllRecipesProxy
                 recipeHash.put("title", "");
                 return recipeHash;
             }	
-        }
-        
+        } 
         // If we encounter an exception here, we can't collect a recipe.
         // We don't need to collect every single recipe, so we can bail at 
         // this point.  We signal an error by setting the title of the 
@@ -202,6 +204,10 @@ public class AllRecipesProxy
             recipeHash.put("title", "");
             return recipeHash;
         }
+         catch(Exception e)
+        {
+            e.printStackTrace();
+        }	
         
         // Try to read the contents of the HTTPURLConnection inputStream
         try 
@@ -379,7 +385,7 @@ public class AllRecipesProxy
 	// back a gzip'ed response.
 	try 
 	{
-	    gis = new GZIPInputStream(connection.getInputStream(), connection.getContentLength());
+	    gis = new GZIPInputStream(connection.getInputStream());
 	    in = new BufferedReader(new InputStreamReader(gis, "ISO-8859-1"));
 			 
 	} 
