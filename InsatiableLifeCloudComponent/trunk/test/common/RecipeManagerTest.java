@@ -26,15 +26,21 @@ import org.w3c.dom.NodeList;
  */
 public class RecipeManagerTest {
     
-    HashMap<String, HashMap<String,String>> testList = new HashMap<>();
+    HashMap<String, HashMap<String,String>> testList;
     File testFile1, testFile2;
+    boolean setupFailed;
     
-    public RecipeManagerTest() {
+    public RecipeManagerTest() 
+    {
+        testList = new HashMap<>();
+        setupFailed = false;
+       
     }
     
     @Before
-    public void setUp() {
-         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    public void setUp() 
+    {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
         Document recipeDoc;
         Element rootElement;
@@ -47,9 +53,8 @@ public class RecipeManagerTest {
         try 
         {
             db = dbf.newDocumentBuilder();
-            testFile1 = new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
-            recipeDoc = db.parse(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
-            testFile1.renameTo(new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist-test.xml"));
+            testFile1 = new File(System.getProperty("user.dir") + "/test/web_utils/recipelist.xml");
+            recipeDoc = db.parse(testFile1);
             
             rootElement = recipeDoc.getDocumentElement();
             rcpList = rootElement.getElementsByTagName("recipe");
@@ -71,8 +76,9 @@ public class RecipeManagerTest {
             }
         } catch (Exception e)
         {
-            
-        }
+            System.out.println(e.getMessage());
+            setupFailed = true;
+        }    
     }
     
     @After
@@ -102,7 +108,7 @@ public class RecipeManagerTest {
             
         } catch(Exception e)
         {
-            fail("Failed to set up testEnd: "+ e.getMessage());
+            fail("Failed setup of testEnd: "+ e.getMessage());
         }
         
     }
@@ -114,6 +120,13 @@ public class RecipeManagerTest {
     public void testFillRecipeList() {
         System.out.println("fillRecipeList");
         RecipeManager instance = null;
+        
+        if(setupFailed)
+        {
+            fail("Setup failed.");
+            return;
+        }
+         
         try
         {
             instance = new RecipeManager();
@@ -131,8 +144,7 @@ public class RecipeManagerTest {
     public void testSerializeRecipeList() {
         System.out.println("serializeRecipeList");
         RecipeManager instance = null;
-        testFile2 = new File(System.getProperty("user.home")+"/sandbox/InsatiableLifeCloudComponent/build/web/WEB-INF/conf/recipelist.xml");
-        
+         
         try
         {
             instance = new RecipeManager();
@@ -140,7 +152,7 @@ public class RecipeManagerTest {
             
         } catch (Exception e)
         {
-            fail("Failed to set up testSerializeReport: "+ e.getMessage());
+            fail("Failed to set up testSerializeRecipeList: "+ e.getMessage());
         }   
         Assert.assertEquals(testFile1, testFile2);
     }
