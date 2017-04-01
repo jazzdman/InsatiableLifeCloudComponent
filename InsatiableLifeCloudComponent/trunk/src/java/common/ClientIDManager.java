@@ -180,7 +180,7 @@ public class ClientIDManager {
     {
         long time;
         StringBuffer clientIDSB;
-        Document doc = null;
+        Document doc;
         Element rootElement;
         Element idNode, requestNode;
         bf.getBusyFlag();
@@ -235,7 +235,7 @@ public class ClientIDManager {
      */
     public boolean validateClientID(String clientID)
     {
-        StringBuffer idBuf = new StringBuffer();
+        StringBuilder idBuf = new StringBuilder();
         boolean isValid = true;
         
         bf.getBusyFlag();

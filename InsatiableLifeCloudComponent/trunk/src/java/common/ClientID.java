@@ -140,7 +140,7 @@ public class ClientID
        
         bw.write("<clientID>");
         bw.write("<ID>"+ID+"</ID>");
-        bw.write("<request>"+new Long(latestRequest).toString() +"</request>");
+        bw.write("<request>"+Long.toString(latestRequest) +"</request>");
         bw.write("<associations>");
         for(String s:associations)
         {
