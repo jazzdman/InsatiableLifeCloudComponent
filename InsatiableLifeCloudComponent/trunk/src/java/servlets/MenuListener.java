@@ -7,6 +7,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
 import common.RecipeManager;
+import java.io.IOException;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 /**
  *
  * This class receives the servlet start and end events.  Upon startup, it 
@@ -86,7 +89,7 @@ public class MenuListener implements ServletContextListener
             th = new Thread(rm);
             th.setDaemon(true);
             th.start();
-        } catch (Exception e)
+        } catch (IOException | ParserConfigurationException | SAXException e)
         {
             rm = null;
         }
@@ -97,7 +100,7 @@ public class MenuListener implements ServletContextListener
             PantryListManager.getInstance().fillPantryList(filePath);
             ClientIDManager.getInstance().fillClientList(filePath);
             
-        } catch (Exception e)
+        } catch (ParserConfigurationException | SAXException | IOException e)
         {
             
         }

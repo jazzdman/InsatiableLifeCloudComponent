@@ -86,7 +86,7 @@ public class ILClientIDServlet extends HttpServlet {
                 {    
                     response.setContentType("text/xml;charset=UTF-8");
                     writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                    writer.println("<error>"+new Integer(PARSE_ERROR).toString()+"</error>");
+                    writer.println("<error>"+Integer.toString(PARSE_ERROR)+"</error>");
                 }
                 break;
         }
@@ -172,7 +172,7 @@ public class ILClientIDServlet extends HttpServlet {
         // If both IDs are not valid, let the client know.
         else 
         {
-            pw.println("<error>"+new Integer(ASSOCIATE_ERROR).toString()+"</error>");
+            pw.println("<error>"+Integer.toString(ASSOCIATE_ERROR)+"</error>");
         }
                          
         
@@ -204,9 +204,6 @@ public class ILClientIDServlet extends HttpServlet {
             
         }
        
-        
-          
-        
     }
 
     /**

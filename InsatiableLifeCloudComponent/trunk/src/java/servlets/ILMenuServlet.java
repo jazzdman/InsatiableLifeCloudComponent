@@ -127,7 +127,7 @@ public class ILMenuServlet extends HttpServlet
 	     	      HttpServletResponse response) throws ServletException,
 							 IOException
     {
-        StringBuffer responseString = new StringBuffer();
+        StringBuilder responseString = new StringBuilder();
         String encodedString;
         List<String> ingredientArray;
         ArrayList<HashMap<String,String>> recipeList;
@@ -143,7 +143,7 @@ public class ILMenuServlet extends HttpServlet
         // Indicate servlet error with count of -1
         if (servletProblem || recipeManager == null)
         {
-            responseString.append("<error>"+ new Integer(SERVER_INIT_ERROR).toString()+"</error>");
+            responseString.append("<error>").append(Integer.toString(SERVER_INIT_ERROR)).append("</error>");
             responseString.append("</recipes>");
             stillOK = false;
         }
@@ -153,7 +153,7 @@ public class ILMenuServlet extends HttpServlet
         // and have acceptable values.
         if (stillOK && !validateRequest(request))
         {
-            responseString.append("<error>"+ new Integer(INVALID_REQUEST_PARAMETERS_ERROR).toString()+"</error>");
+            responseString.append("<error>").append(Integer.toString(INVALID_REQUEST_PARAMETERS_ERROR)).append("</error>");
             responseString.append("</recipes>");
             stillOK = false;
         }
@@ -180,25 +180,25 @@ public class ILMenuServlet extends HttpServlet
                 // Create a recipe Node
                 responseString.append("<recipe>");
                 // Write out the title for the recipe
-                responseString.append("<title><![CDATA[ "+(String)recipe.get("title")+" ]]></title>");
+                responseString.append("<title><![CDATA[ ").append((String)recipe.get("title")).append(" ]]></title>");
                 // Write out the URL for the recipe
-                responseString.append("<url><![CDATA[ "+(String)recipe.get("url")+" ]]></url>");
+                responseString.append("<url><![CDATA[ ").append((String)recipe.get("url")).append(" ]]></url>");
                 
                 // Try to gzip the page HTML
                 try
                 {
                     encodedString = compress((String)recipe.get("page"));
-                    responseString.append("<page><![CDATA[ "+ encodedString +" ]]></page>");
+                    responseString.append("<page><![CDATA[ ").append(encodedString).append(" ]]></page>");
                 }
                 // If that fails just write the page HTML to the document
                 catch(Exception e)
                 {
-                    responseString.append("<page><![CDATA[ "+(String)recipe.get("page")+" ]]></page>");
+                    responseString.append("<page><![CDATA[ ").append((String)recipe.get("page")).append(" ]]></page>");
                 }
                 
                 for(String ingredient:ingredientArray)
                 {
-                    responseString.append("<ingredient><![CDATA[ "+ingredient+" ]]></ingredient>");
+                    responseString.append("<ingredient><![CDATA[ ").append(ingredient).append(" ]]></ingredient>");
                 }
                 
                 responseString.append("</recipe>");

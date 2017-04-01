@@ -80,7 +80,7 @@ public class ILSettingsServlet extends HttpServlet
             preptemp = Integer.parseInt(tempString1)+
                        MINUTES_PER_HOUR*Integer.parseInt(tempString2);
         
-            prepTime = new Integer(preptemp).toString();
+            prepTime = Integer.toString(preptemp);
         
             calories = servletContext.getInitParameter("calories");
             
@@ -121,28 +121,28 @@ public class ILSettingsServlet extends HttpServlet
 							   IOException,
                                                            NumberFormatException
     {
-        StringBuffer respBuf = new StringBuffer();
+        StringBuilder respBuf = new StringBuilder();
         
         respBuf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
          
         if(!validateRequest(request))
         {
             respBuf.append("</params>");
-            respBuf.append("<error>"+ new Integer(VALIDATION_ERROR).toString() +"</error>");
+            respBuf.append("<error>").append(Integer.toString(VALIDATION_ERROR)).append("</error>");
             respBuf.append("</params>");
                 
         } else if(servletProblem)
         {
             respBuf.append("</params>");
-            respBuf.append("<error>"+ new Integer(SERVER_INIT_ERROR).toString() +"</error>");
+            respBuf.append("<error>").append(Integer.toString(SERVER_INIT_ERROR)).append("</error>");
             respBuf.append("</params>");
                 
         } else {
             
             respBuf.append("<params>");
-            respBuf.append("<preptime>"+ prepTime +"</preptime>");
-            respBuf.append("<servings>"+ servings +"</servings>");
-            respBuf.append("<calories>"+ calories +"</calories>");
+            respBuf.append("<preptime>").append(prepTime).append("</preptime>");
+            respBuf.append("<servings>").append(servings).append("</servings>");
+            respBuf.append("<calories>").append(calories).append("</calories>");
             respBuf.append("</params>");
         }
             
