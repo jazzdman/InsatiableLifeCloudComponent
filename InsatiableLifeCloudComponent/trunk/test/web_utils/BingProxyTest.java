@@ -81,7 +81,7 @@ public class BingProxyTest
          
         instance = new BingProxy(dishes,ingredients);
         String expResult;
-        expResult = "http://www.bing.com/search?q=veal+bake+site%3Aallrecipes.com";
+        expResult = "https://api.cognitive.microsoft.com/bing/v5.0/search?q=veal+bake+site%3Aallrecipes.com&count=100&offset=0";
         String result = instance.getRequest(rndVal1, rndVal2);
         assertEquals(expResult, result);
         
@@ -132,37 +132,7 @@ public class BingProxyTest
         
         instance.findRecipes(rndVal1, rndVal2);
         // TODO review the generated test code and remove the default call to fail.
-        assertTrue(new Integer(instance.getSearchResults().size()).toString() , instance.getSearchResults().size() > 0 );
+        assertTrue(new Integer(instance.getRecipeURLs().size()).toString() , instance.getRecipeURLs().size() > 0 );
     }
 
-
-    /**
-     * Test of filterRecipes method, of class BingProxy.
-     */
-    @Test
-    public void testFilterRecipes() {
-        System.out.println("filterRecipes");
-        int rndIndex = 2;
-        BingProxy instance = new BingProxy(dishes,ingredients);
-        
-        
-         if(setupFailed)
-        {
-            fail("Setup failed.");
-            return;
-        }
-        
-        if(instance == null)
-        {
-            fail("Instance is null.");
-            return;
-        }
-        
-        instance.findRecipes(rndVal1, rndVal2);
-        instance.filterRecipes(rndIndex);
-        // TODO review the generated test code and remove the default call to fail.
-        assertTrue(new Integer(instance.getRecipeURLs().size()).toString() ,
-                   instance.getRecipeURLs().size() > 0 );
-    }
-    
 }

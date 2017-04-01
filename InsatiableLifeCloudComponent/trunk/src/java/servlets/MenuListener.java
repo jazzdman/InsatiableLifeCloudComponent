@@ -3,7 +3,6 @@ package servlets;
 import common.ClientIDManager;
 import common.GroceryListManager;
 import common.PantryListManager;
-import java.io.IOException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;

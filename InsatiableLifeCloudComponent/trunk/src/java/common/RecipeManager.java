@@ -169,10 +169,6 @@ public class RecipeManager implements Runnable
                 // Get recipe URLs from Bing
                 bingProxy.findRecipes(rnd.nextDouble(), rnd.nextDouble());
                 
-                // Get a random number based on the number of search
-                // results
-                rndIndex = (int)rnd.nextDouble()*bingProxy.getSearchResults().size();
-                bingProxy.filterRecipes(rndIndex);
                 
                 // If we have no recipe URLs for this loop, start again.
                 if(bingProxy.getRecipeURLs().isEmpty())
