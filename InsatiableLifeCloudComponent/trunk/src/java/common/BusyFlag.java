@@ -60,11 +60,6 @@ public class BusyFlag
             busyflag = Thread.currentThread();
             return true;
         }
-
-        if (busyflag == Thread.currentThread()) 
-	{
-            return true;
-        }
         
         return false;
     }
